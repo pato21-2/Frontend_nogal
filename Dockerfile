@@ -8,7 +8,7 @@ RUN npm run build --configuration=production
 
 # Paso 2: Servir la app usando Nginx
 FROM nginx:alpine
-# ✅ Cambiado de 'tu-nombre-de-proyecto' a 'nogal_a'
-COPY --from=build /app/dist/nogal_a /usr/share/nginx/html
+# ✅ Ajustado para incluir la carpeta 'browser' que genera Angular actualmente
+COPY --from=build /app/dist/nogal_a/browser /usr/share/nginx/html
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
