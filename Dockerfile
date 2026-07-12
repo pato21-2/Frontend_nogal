@@ -8,7 +8,7 @@ RUN npm run build --configuration=production
 
 # Paso 2: Servir la app usando Nginx
 FROM nginx:alpine
-# ⚠️ CAMBIA 'tu-nombre-de-proyecto' por el nombre exacto del paso 1
-COPY --from=build /app/dist/tu-nombre-de-proyecto /usr/share/nginx/html
+# ✅ Cambiado de 'tu-nombre-de-proyecto' a 'nogal_a'
+COPY --from=build /app/dist/nogal_a /usr/share/nginx/html
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
