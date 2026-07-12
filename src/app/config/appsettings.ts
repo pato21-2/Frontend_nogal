@@ -1,3 +1,3 @@
 export const appsettings = {
-    apiurl: "http://localhost:8080/"
+    apiurl: "https://backend-nogal.onrender.com"
 }
