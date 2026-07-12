@@ -1,6 +1,0 @@
-projectKey=sistema-comercial-frontend
-serverUrl=http://localhost:9000
-serverVersion=26.6.0.123539
-dashboardUrl=http://localhost:9000/dashboard?id=sistema-comercial-frontend
-ceTaskId=72a0e2d9-d8c2-4412-afc1-dd9b56b20c71
-ceTaskUrl=http://localhost:9000/api/ce/task?id=72a0e2d9-d8c2-4412-afc1-dd9b56b20c71
