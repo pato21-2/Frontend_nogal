@@ -9,7 +9,7 @@ import { Producto } from '../../models/producto';
 export class ProductoService {
   private http = inject(HttpClient);
   // Agregamos la barra diagonal aquí para que quede como ".../producto/"
-  private urlservicio = appsettings.apiurl + "producto/";
+  private urlservicio = appsettings.apiurl + "/producto";
 
   constructor() { }
 
