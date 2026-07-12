@@ -8,7 +8,8 @@ import { Producto } from '../../models/producto';
 })
 export class ProductoService {
   private http = inject(HttpClient);
-  private urlservicio = appsettings.apiurl + "producto";
+  // Agregamos la barra diagonal aquí para que quede como ".../producto/"
+  private urlservicio = appsettings.apiurl + "producto/";
 
   constructor() { }
 
@@ -17,50 +18,50 @@ export class ProductoService {
   }
 
   listarTodosProductos() {
-    return this.http.get<Producto[]>(`${this.urlservicio}/todos`);
+    return this.http.get<Producto[]>(`${this.urlservicio}todos`);
   }
 
   listarProductosPorProveedor(proveedorId: number) {
-    return this.http.get<Producto[]>(`${this.urlservicio}/proveedor/${proveedorId}`);
+    return this.http.get<Producto[]>(`${this.urlservicio}proveedor/${proveedorId}`);
   }
 
   listarProductosPorCategoria(categoriaId: number) {
-    return this.http.get<Producto[]>(`${this.urlservicio}/categoria/${categoriaId}`);
+    return this.http.get<Producto[]>(`${this.urlservicio}categoria/${categoriaId}`);
   }
 
   listarProductosStockBajo() {
-    return this.http.get<Producto[]>(`${this.urlservicio}/stock-bajo`);
+    return this.http.get<Producto[]>(`${this.urlservicio}stock-bajo`);
   }
 
   listarProductosOfertas() {
-    return this.http.get<Producto[]>(`${this.urlservicio}/ofertas`);
+    return this.http.get<Producto[]>(`${this.urlservicio}ofertas`);
   }
 
   listarProductosEconomicos() {
-    return this.http.get<Producto[]>(`${this.urlservicio}/economicos`);
+    return this.http.get<Producto[]>(`${this.urlservicio}economicos`);
   }
 
   buscarProductos(nombre: string) {
-    return this.http.get<Producto[]>(`${this.urlservicio}/nombre/${nombre}`);
+    return this.http.get<Producto[]>(`${this.urlservicio}nombre/${nombre}`);
   }
 
   getProducto(id: number) {
-    return this.http.get<Producto>(`${this.urlservicio}/${id}`);
+    return this.http.get<Producto>(`${this.urlservicio}${id}`);
   }
 
   crearProducto(obj: Producto) {
-    return this.http.post<Producto>(`${this.urlservicio}/crear`, obj);
+    return this.http.post<Producto>(`${this.urlservicio}crear`, obj);
   }
 
   actualizarProducto(id: number, obj: Producto) {
-    return this.http.put<Producto>(`${this.urlservicio}/${id}`, obj);
+    return this.http.put<Producto>(`${this.urlservicio}${id}`, obj);
   }
 
   eliminarProducto(id: number) {
-    return this.http.delete<String>(`${this.urlservicio}/${id}`);
+    return this.http.delete<String>(`${this.urlservicio}${id}`);
   }
 
   actualizarStock(id: number, cantidad: number) {
-    return this.http.put<String>(`${this.urlservicio}/${id}/stock/${cantidad}`, {});
+    return this.http.put<String>(`${this.urlservicio}${id}/stock/${cantidad}`, {});
   }
 }
