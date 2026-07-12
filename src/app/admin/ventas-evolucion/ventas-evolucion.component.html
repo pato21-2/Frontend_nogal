@@ -1,0 +1,493 @@
+<div class="admin-panel">
+  <!-- Header -->
+  <header class="admin-header sticky-top p-3">
+    <div class="container-fluid">
+      <div class="d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center">
+          <button class="btn btn-outline-admin me-3" (click)="volverAlPanel()">
+            <i class="bi bi-arrow-left"></i>
+          </button>
+          <h4 class="mb-0 text-gold">
+            <i class="bi bi-graph-up me-2"></i>Evolución de Ventas
+          </h4>
+        </div>
+        <div class="d-flex gap-2">
+          <button class="btn btn-outline-admin" (click)="recargarDatos()" [disabled]="cargando">
+            <i class="bi" [class.bi-arrow-clockwise]="!cargando" [class.bi-arrow-repeat]="cargando"></i>
+            {{ cargando ? 'Cargando...' : 'Actualizar' }}
+          </button>
+          <button class="btn btn-primary-admin" (click)="exportarDatos()" [disabled]="cargando || evolucionVentas.length === 0">
+            <i class="bi bi-file-earmark-excel"></i> Exportar CSV
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Content -->
+  <main class="container-fluid py-4">
+    <!-- Filtros -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="chart-container">
+          <div class="chart-header">
+            <h5 class="chart-title">
+              <i class="bi bi-funnel me-2"></i>Filtros de Período
+            </h5>
+            <div class="text-muted small">
+              <i class="bi bi-info-circle me-1"></i>
+              Datos en tiempo real desde la base de datos
+            </div>
+          </div>
+          
+          <div class="row mt-3">
+            <div class="col-md-4 mb-3">
+              <label class="form-label form-label-admin">
+                <i class="bi bi-calendar-week me-1"></i>Período Rápido
+              </label>
+              <div class="btn-group w-100" role="group">
+                <button type="button" class="btn btn-outline-admin" 
+                        [class.active]="periodoSeleccionado === '7dias'"
+                        (click)="cambiarPeriodo('7dias')"
+                        [disabled]="cargando">
+                  7 Días
+                </button>
+                <button type="button" class="btn btn-outline-admin" 
+                        [class.active]="periodoSeleccionado === '30dias'"
+                        (click)="cambiarPeriodo('30dias')"
+                        [disabled]="cargando">
+                  30 Días
+                </button>
+                <button type="button" class="btn btn-outline-admin" 
+                        [class.active]="periodoSeleccionado === '90dias'"
+                        (click)="cambiarPeriodo('90dias')"
+                        [disabled]="cargando">
+                  90 Días
+                </button>
+              </div>
+            </div>
+            
+            <div class="col-md-4 mb-3">
+              <label class="form-label form-label-admin">
+                <i class="bi bi-calendar-date me-1"></i>Fecha Inicio
+              </label>
+              <input type="date" class="form-control form-control-admin" 
+                     [(ngModel)]="fechaInicio"
+                     [disabled]="cargando">
+            </div>
+            
+            <div class="col-md-4 mb-3">
+              <label class="form-label form-label-admin">
+                <i class="bi bi-calendar-date me-1"></i>Fecha Fin
+              </label>
+              <input type="date" class="form-control form-control-admin" 
+                     [(ngModel)]="fechaFin"
+                     [disabled]="cargando">
+            </div>
+          </div>
+          
+          <div class="row">
+            <div class="col-12">
+              <button class="btn btn-primary-admin" 
+                      (click)="aplicarFiltroFechas()"
+                      [disabled]="cargando || !fechaInicio || !fechaFin">
+                <i class="bi bi-funnel"></i> Aplicar Filtro Personalizado
+              </button>
+              <button class="btn btn-outline-admin ms-2" 
+                      (click)="establecerFechasPorDefecto()"
+                      [disabled]="cargando">
+                <i class="bi bi-clock-history"></i> Restablecer a 30 días
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Resumen Estadístico REAL -->
+    <div class="row mb-4">
+      <div class="col-xl-3 col-md-6 mb-4">
+        <div class="metric-card animate-fade-in-up">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <div class="metric-value text-success">
+                {{ formatearMoneda(estadisticas.totalVentas) }}
+              </div>
+              <div class="metric-label">Total del Período</div>
+              <div class="metric-change text-success small">
+                <i class="bi bi-cash-coin me-1"></i>
+                {{ estadisticas.totalPedidosPeriodo }} pedidos
+              </div>
+            </div>
+            <i class="bi bi-currency-dollar fs-2 text-success"></i>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-xl-3 col-md-6 mb-4">
+        <div class="metric-card animate-fade-in-up">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <div class="metric-value text-info">
+                {{ formatearMoneda(estadisticas.promedioDiario) }}
+              </div>
+              <div class="metric-label">Promedio Diario</div>
+              <div class="metric-change text-info small">
+                <i class="bi bi-graph-up me-1"></i>
+                {{ evolucionVentas.length }} días analizados
+              </div>
+            </div>
+            <i class="bi bi-bar-chart-line fs-2 text-info"></i>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-xl-3 col-md-6 mb-4">
+        <div class="metric-card animate-fade-in-up">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <div class="metric-value text-warning">
+                {{ formatearMoneda(estadisticas.diaMaxVentas.ventas) }}
+              </div>
+              <div class="metric-label">Mejor Día</div>
+              <div class="text-muted small">
+                {{ formatearFecha(estadisticas.diaMaxVentas.fecha) }}
+              </div>
+            </div>
+            <i class="bi bi-trophy fs-2 text-warning"></i>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-xl-3 col-md-6 mb-4">
+        <div class="metric-card animate-fade-in-up">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <div class="metric-value d-flex align-items-center">
+                <i class="bi me-2 fs-4" 
+                   [ngClass]="obtenerIconoTendencia()"
+                   [class.text-success]="estadisticas.tendencia === 'ascendente'"
+                   [class.text-danger]="estadisticas.tendencia === 'descendente'"
+                   [class.text-warning]="estadisticas.tendencia === 'estable'"></i>
+                <span [ngClass]="obtenerColorTendencia()" class="fs-4">
+                  {{ estadisticas.tendencia.toUpperCase() }}
+                </span>
+              </div>
+              <div class="metric-label">Tendencia General</div>
+              <div class="metric-change small" [ngClass]="obtenerColorTendencia()">
+                <i class="bi" 
+                   [class.bi-arrow-up-right]="estadisticas.tendencia === 'ascendente'"
+                   [class.bi-arrow-down-right]="estadisticas.tendencia === 'descendente'"
+                   [class.bi-arrow-right]="estadisticas.tendencia === 'estable'"></i>
+                Últimos {{ evolucionVentas.length }} días
+              </div>
+            </div>
+            <i class="bi bi-activity fs-2" [ngClass]="obtenerColorTendencia()"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Gráfico ECharts REAL -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="chart-container animate-fade-in-up">
+          <div class="chart-header">
+            <h5 class="chart-title">
+              <i class="bi bi-graph-up-arrow me-2"></i>
+              Evolución de Ventas - Análisis Diario
+            </h5>
+            <div class="d-flex align-items-center gap-2">
+              <div class="badge bg-success">
+                <i class="bi bi-check-circle me-1"></i>Excelente
+              </div>
+              <div class="badge bg-info">
+                <i class="bi bi-check-circle me-1"></i>Bueno
+              </div>
+              <div class="badge bg-warning">
+                <i class="bi bi-dash-circle me-1"></i>Normal
+              </div>
+              <div class="badge bg-danger">
+                <i class="bi bi-exclamation-circle me-1"></i>Bajo
+              </div>
+            </div>
+          </div>
+          
+          <!-- Contenedor del gráfico ECharts -->
+          <div *ngIf="isChartReady && !cargando" class="echarts-container mt-3">
+            <div echarts [options]="chartOption" [autoResize]="true" 
+                 style="height: 450px; width: 100%;"></div>
+          </div>
+
+          <!-- Mensaje de carga -->
+          <div *ngIf="cargando" class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Cargando...</span>
+            </div>
+            <p class="mt-3 text-muted">
+              <i class="bi bi-database me-1"></i>
+              Cargando datos reales desde la base de datos...
+            </p>
+          </div>
+
+          <!-- Mensaje sin datos -->
+          <div *ngIf="!cargando && evolucionVentas.length === 0" class="text-center py-5">
+            <i class="bi bi-graph-up fs-1 text-muted d-block mb-3"></i>
+            <p class="text-muted">No hay datos de ventas para el período seleccionado</p>
+            <button class="btn btn-primary-admin mt-2" (click)="recargarDatos()">
+              <i class="bi bi-arrow-clockwise"></i> Intentar nuevamente
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabla de datos detallados REALES -->
+    <div class="row" *ngIf="evolucionVentas.length > 0 && !cargando">
+      <div class="col-12">
+        <div class="chart-container animate-fade-in-up">
+          <div class="chart-header">
+            <h5 class="chart-title">
+              <i class="bi bi-table me-2"></i>
+              Detalle de Ventas por Día
+            </h5>
+            <div class="text-muted small">
+              Mostrando {{ evolucionVentas.length }} días • 
+              Total: {{ formatearMoneda(estadisticas.totalVentas) }}
+            </div>
+          </div>
+          
+          <div class="table-responsive">
+            <table class="table table-hover ventas-table">
+              <thead>
+                <tr>
+                  <th width="15%">
+                    <i class="bi bi-calendar me-1"></i>Fecha
+                  </th>
+                  <th width="10%">
+                    <i class="bi bi-calendar-day me-1"></i>Día
+                  </th>
+                  <th width="20%">
+                    <i class="bi bi-cash-stack me-1"></i>Ventas del Día
+                  </th>
+                  <th width="20%">
+                    <i class="bi bi-arrow-left-right me-1"></i>Variación Diaria
+                  </th>
+                  <th width="20%">
+                    <i class="bi bi-percent me-1"></i>vs Promedio
+                  </th>
+                  <th width="15%">
+                    <i class="bi bi-speedometer2 me-1"></i>Estado
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let dia of evolucionVentas; let i = index"
+                    [class.table-success]="dia.ventas > estadisticas.promedioDiario * 1.5"
+                    [class.table-info]="dia.ventas > estadisticas.promedioDiario * 1.2 && dia.ventas <= estadisticas.promedioDiario * 1.5"
+                    [class.table-warning]="dia.ventas >= estadisticas.promedioDiario * 0.8 && dia.ventas <= estadisticas.promedioDiario * 1.2"
+                    [class.table-danger]="dia.ventas < estadisticas.promedioDiario * 0.8">
+                  
+                  <!-- Fecha -->
+                  <td>
+                    <strong>{{ formatearFecha(dia.fecha) }}</strong>
+                  </td>
+                  
+                  <!-- Día de la semana -->
+                  <td>
+                    <span class="badge bg-secondary">
+                      <i class="bi bi-calendar-week me-1"></i>{{ dia.nombre }}
+                    </span>
+                  </td>
+                  
+                  <!-- Ventas del día -->
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <i class="bi bi-cash-coin text-success me-2"></i>
+                      <span class="text-success fw-bold">{{ formatearMoneda(dia.ventas) }}</span>
+                    </div>
+                  </td>
+                  
+                  <!-- Variación diaria -->
+                  <td>
+                    <div *ngIf="i > 0" class="d-flex align-items-center">
+                      <i class="bi me-2" 
+                         [ngClass]="{
+                           'bi-arrow-up text-success': dia.ventas > evolucionVentas[i-1].ventas,
+                           'bi-arrow-down text-danger': dia.ventas < evolucionVentas[i-1].ventas,
+                           'bi-dash text-muted': dia.ventas === evolucionVentas[i-1].ventas
+                         }"></i>
+                      <span [ngClass]="{
+                        'text-success': dia.ventas > evolucionVentas[i-1].ventas,
+                        'text-danger': dia.ventas < evolucionVentas[i-1].ventas,
+                        'text-muted': dia.ventas === evolucionVentas[i-1].ventas
+                      }">
+                        {{ formatearMoneda(Math.abs(dia.ventas - evolucionVentas[i-1].ventas)) }}
+                        ({{ dia.ventas > evolucionVentas[i-1].ventas ? '+' : '' }}
+                        {{ ((dia.ventas / evolucionVentas[i-1].ventas - 1) * 100).toFixed(1) }}%)
+                      </span>
+                    </div>
+                    <div *ngIf="i === 0" class="text-muted">
+                      <i class="bi bi-dash me-2"></i>Sin comparación
+                    </div>
+                  </td>
+                  
+                  <!-- Comparación vs Promedio -->
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <i class="bi me-2" 
+                         [ngClass]="{
+                           'bi-arrow-up-right text-success': dia.ventas > estadisticas.promedioDiario,
+                           'bi-arrow-down-right text-danger': dia.ventas < estadisticas.promedioDiario,
+                           'bi-dash text-muted': dia.ventas === estadisticas.promedioDiario
+                         }"></i>
+                      <span [ngClass]="{
+                        'text-success': dia.ventas > estadisticas.promedioDiario,
+                        'text-danger': dia.ventas < estadisticas.promedioDiario,
+                        'text-muted': dia.ventas === estadisticas.promedioDiario
+                      }">
+                        {{ ((dia.ventas / estadisticas.promedioDiario - 1) * 100).toFixed(1) }}%
+                        <small class="text-muted ms-1">
+                          ({{ formatearMoneda(Math.abs(dia.ventas - estadisticas.promedioDiario)) }})
+                        </small>
+                      </span>
+                    </div>
+                  </td>
+                  
+                  <!-- Estado -->
+                  <td>
+                    <span class="badge" [ngClass]="{
+                      'bg-success': dia.ventas > estadisticas.promedioDiario * 1.5,
+                      'bg-info': dia.ventas > estadisticas.promedioDiario * 1.2 && dia.ventas <= estadisticas.promedioDiario * 1.5,
+                      'bg-warning': dia.ventas >= estadisticas.promedioDiario * 0.8 && dia.ventas <= estadisticas.promedioDiario * 1.2,
+                      'bg-danger': dia.ventas < estadisticas.promedioDiario * 0.8
+                    }">
+                      <i class="bi me-1" [ngClass]="{
+                        'bi-check-circle': dia.ventas > estadisticas.promedioDiario * 1.5,
+                        'bi-check-circle': dia.ventas > estadisticas.promedioDiario * 1.2 && dia.ventas <= estadisticas.promedioDiario * 1.5,
+                        'bi-dash-circle': dia.ventas >= estadisticas.promedioDiario * 0.8 && dia.ventas <= estadisticas.promedioDiario * 1.2,
+                        'bi-exclamation-circle': dia.ventas < estadisticas.promedioDiario * 0.8
+                      }"></i>
+                      {{ dia.ventas > estadisticas.promedioDiario * 1.5 ? 'Excelente' : 
+                         dia.ventas > estadisticas.promedioDiario * 1.2 ? 'Bueno' :
+                         dia.ventas >= estadisticas.promedioDiario * 0.8 ? 'Normal' : 'Bajo' }}
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Información adicional y insights -->
+    <div class="row mt-4" *ngIf="evolucionVentas.length > 0 && !cargando">
+      <div class="col-12">
+        <div class="chart-container">
+          <div class="row">
+            <!-- Insights -->
+            <div class="col-md-6">
+              <h6 class="mb-3 text-gold">
+                <i class="bi bi-lightbulb me-2"></i>Insights y Recomendaciones
+              </h6>
+              
+              <div class="insight-card mb-3" 
+                   [class.border-success]="estadisticas.tendencia === 'ascendente'"
+                   [class.border-danger]="estadisticas.tendencia === 'descendente'"
+                   [class.border-warning]="estadisticas.tendencia === 'estable'">
+                <div class="insight-header">
+                  <i class="bi" 
+                     [class.bi-arrow-up-right]="estadisticas.tendencia === 'ascendente'"
+                     [class.bi-arrow-down-right]="estadisticas.tendencia === 'descendente'"
+                     [class.bi-arrow-right]="estadisticas.tendencia === 'estable'"
+                     [class.text-success]="estadisticas.tendencia === 'ascendente'"
+                     [class.text-danger]="estadisticas.tendencia === 'descendente'"
+                     [class.text-warning]="estadisticas.tendencia === 'estable'"></i>
+                  <strong class="ms-2">Tendencia {{ estadisticas.tendencia }}</strong>
+                </div>
+                <div class="insight-body text-muted small">
+                  <span *ngIf="estadisticas.tendencia === 'ascendente'">
+                    Las ventas muestran un crecimiento positivo. 
+                    Considera mantener o aumentar las estrategias de marketing que están funcionando.
+                  </span>
+                  <span *ngIf="estadisticas.tendencia === 'descendente'">
+                    Las ventas están en descenso. 
+                    Es recomendable revisar estrategias de ventas y considerar promociones especiales.
+                  </span>
+                  <span *ngIf="estadisticas.tendencia === 'estable'">
+                    Las ventas se mantienen estables. 
+                    Busca oportunidades para impulsar el crecimiento con nuevas estrategias.
+                  </span>
+                </div>
+              </div>
+              
+              <div class="insight-card mb-3 border-primary">
+                <div class="insight-header">
+                  <i class="bi bi-calendar-event text-primary"></i>
+                  <strong class="ms-2">Día Pico: {{ formatearFecha(estadisticas.diaMaxVentas.fecha) }}</strong>
+                </div>
+                <div class="insight-body text-muted small">
+                  El día con mejores ventas alcanzó {{ formatearMoneda(estadisticas.diaMaxVentas.ventas) }}.
+                  Analiza qué factores influyeron para replicar este éxito en otros días.
+                </div>
+              </div>
+            </div>
+            
+            <!-- Leyenda y ayuda -->
+            <div class="col-md-6">
+              <h6 class="mb-3 text-gold">
+                <i class="bi bi-info-circle me-2"></i>Cómo Interpretar los Datos
+              </h6>
+              
+              <div class="row">
+                <div class="col-6 mb-3">
+                  <div class="d-flex align-items-center mb-2">
+                    <div class="color-indicator bg-success me-2"></div>
+                    <span class="small">Excelente (+50% del promedio)</span>
+                  </div>
+                  <div class="d-flex align-items-center mb-2">
+                    <div class="color-indicator bg-info me-2"></div>
+                    <span class="small">Bueno (+20% del promedio)</span>
+                  </div>
+                </div>
+                <div class="col-6 mb-3">
+                  <div class="d-flex align-items-center mb-2">
+                    <div class="color-indicator bg-warning me-2"></div>
+                    <span class="small">Normal (±20% del promedio)</span>
+                  </div>
+                  <div class="d-flex align-items-center mb-2">
+                    <div class="color-indicator bg-danger me-2"></div>
+                    <span class="small">Bajo (-20% del promedio)</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="alert alert-info mt-3">
+                <div class="d-flex">
+                  <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                  <div>
+                    <strong>Nota:</strong> Los datos se actualizan en tiempo real desde la base de datos.
+                    El promedio se calcula sobre el período seleccionado.
+                  </div>
+                </div>
+              </div>
+              
+              <div class="d-flex gap-2 mt-3">
+                <button class="btn btn-sm btn-outline-admin" (click)="exportarDatos()">
+                  <i class="bi bi-download me-1"></i>Exportar Datos
+                </button>
+                <button class="btn btn-sm btn-outline-admin" (click)="recargarDatos()">
+                  <i class="bi bi-arrow-clockwise me-1"></i>Actualizar
+                </button>
+                <button class="btn btn-sm btn-outline-admin" (click)="volverAlPanel()">
+                  <i class="bi bi-house me-1"></i>Volver al Panel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>

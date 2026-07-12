@@ -1,0 +1,344 @@
+<div class="container-fluid py-4">
+  <!-- Header -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center">
+        <h2 class="mb-0">
+          <i class="bi bi-cart3 me-2"></i>
+          Mi Carrito de Compras
+        </h2>
+        <button class="btn btn-outline-secondary" routerLink="/principal">
+          <i class="bi bi-arrow-left me-1"></i> Seguir Comprando
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Carrito Vacío -->
+  <div *ngIf="carrito.length === 0" class="row">
+    <div class="col-12">
+      <div class="card text-center py-5">
+        <div class="card-body">
+          <i class="bi bi-cart-x" style="font-size: 4rem; color: #6c757d;"></i>
+          <h4 class="mt-3">Tu carrito está vacío</h4>
+          <p class="text-muted">Agrega algunos productos increíbles de nuestro catálogo</p>
+          <button class="btn btn-primary btn-lg" routerLink="/principal">
+            <i class="bi bi-bag me-2"></i> Descubrir Productos
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Carrito con Productos -->
+  <div *ngIf="carrito.length > 0" class="row">
+    <!-- Lista de Productos -->
+    <div class="col-lg-8">
+      <div class="card">
+        <div class="card-header bg-light">
+          <h5 class="mb-0">Productos en el Carrito ({{ carrito.length }})</h5>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover mb-0">
+              <thead class="table-dark">
+                <tr>
+                  <th width="300">Producto</th>
+                  <th class="text-center">Precio Unitario</th>
+                  <th class="text-center">Cantidad</th>
+                  <th class="text-center">Subtotal</th>
+                  <th width="80"></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of carrito; let i = index" class="align-middle">
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <div class="product-image me-3">
+                        <img [src]="getProductImage(item.producto)" 
+                             [alt]="item.producto.nombre"
+                             class="rounded"
+                             style="width: 60px; height: 60px; object-fit: cover;">
+                      </div>
+                      <div>
+                        <h6 class="mb-1">{{ item.producto.nombre }}</h6>
+                        <small class="text-muted">
+                          {{ item.producto.categoria?.nombre }} • 
+                          {{ item.producto.material || 'Material no especificado' }}
+                        </small>
+                        <div class="stock-info mt-1">
+                          <small [ngClass]="{
+                            'text-success': item.producto.stock > 10,
+                            'text-warning': item.producto.stock <= 10 && item.producto.stock > 0,
+                            'text-danger': item.producto.stock === 0
+                          }">
+                            <i class="bi bi-box-seam me-1"></i>
+                            {{ getStockText(item.producto.stock) }}
+                          </small>
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="text-center">
+                    <strong class="text-success">S/ {{ item.precioUnitario | number:'1.2-2' }}</strong>
+                  </td>
+                  <td class="text-center">
+                    <div class="quantity-controls d-flex align-items-center justify-content-center">
+                      <button class="btn btn-outline-secondary btn-sm" 
+                              (click)="decrementarCantidad(item)"
+                              [disabled]="item.cantidad <= 1">
+                        <i class="bi bi-dash"></i>
+                      </button>
+                      <span class="mx-3 fw-bold">{{ item.cantidad }}</span>
+                      <button class="btn btn-outline-secondary btn-sm" 
+                              (click)="incrementarCantidad(item)"
+                              [disabled]="!hayStockSuficiente(item)">
+                        <i class="bi bi-plus"></i>
+                      </button>
+                    </div>
+                    <small *ngIf="!hayStockSuficiente(item)" class="text-danger d-block mt-1">
+                      Stock máximo: {{ item.producto.stock }}
+                    </small>
+                  </td>
+                  <td class="text-center">
+                    <strong class="text-primary">S/ {{ item.subtotal | number:'1.2-2' }}</strong>
+                  </td>
+                  <td class="text-center">
+                    <button class="btn btn-outline-danger btn-sm" 
+                            (click)="eliminarProducto(item.producto.id!)"
+                            title="Eliminar del carrito">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Acciones del Carrito -->
+      <div class="row mt-3">
+        <div class="col-12">
+          <div class="d-flex justify-content-between">
+            <button class="btn btn-outline-secondary" (click)="limpiarCarrito()">
+              <i class="bi bi-trash me-1"></i> Vaciar Carrito
+            </button>
+            <button class="btn btn-primary" routerLink="/principal">
+              <i class="bi bi-plus-circle me-1"></i> Agregar Más Productos
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Resumen de Compra -->
+    <div class="col-lg-4">
+      <div class="card sticky-top" style="top: 20px;">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0"><i class="bi bi-receipt me-2"></i>Resumen de Compra</h5>
+        </div>
+        <div class="card-body">
+          <div class="resumen-item d-flex justify-content-between mb-2">
+            <span>Subtotal:</span>
+            <strong>S/ {{ subtotal | number:'1.2-2' }}</strong>
+          </div>
+          <div class="resumen-item d-flex justify-content-between mb-2">
+            <span>Envío:</span>
+            <strong class="text-success" *ngIf="subtotal > 100">GRATIS</strong>
+            <strong class="text-danger" *ngIf="subtotal <= 100">S/ 15.00</strong>
+          </div>
+          <div class="resumen-item d-flex justify-content-between mb-3">
+            <span>IGV (18%):</span>
+            <strong>S/ {{ igv | number:'1.2-2' }}</strong>
+          </div>
+          <hr>
+          <div class="resumen-total d-flex justify-content-between mb-4">
+            <span class="fs-5 fw-bold">Total:</span>
+            <strong class="fs-5 text-primary">S/ {{ total | number:'1.2-2' }}</strong>
+          </div>
+
+          <!-- Información de Envío -->
+          <div class="alert alert-info" *ngIf="subtotal <= 100">
+            <small>
+              <i class="bi bi-info-circle me-1"></i>
+              <strong>¡Faltan S/ {{ 100 - subtotal | number:'1.2-2' }} para envío gratis!</strong>
+            </small>
+          </div>
+
+          <div class="alert alert-success" *ngIf="subtotal > 100">
+            <small>
+              <i class="bi bi-check-circle me-1"></i>
+              <strong>¡Felicidades! Tienes envío gratis</strong>
+            </small>
+          </div>
+
+          <!-- Botón de Checkout -->
+          <div class="d-grid gap-2">
+            <button class="btn btn-success btn-lg" 
+                    (click)="procederAlPago()"
+                    [disabled]="!hayStockDisponible()">
+              <i class="bi bi-lock-fill me-2"></i>
+              Proceder al Pago
+            </button>
+          </div>
+
+          <!-- Medios de Pago -->
+          <div class="mt-3">
+            <small class="text-muted d-block mb-2">Medios de pago aceptados:</small>
+            <div class="d-flex gap-2 flex-wrap">
+              <span class="badge bg-primary">Visa</span>
+              <span class="badge bg-warning text-dark">Mastercard</span>
+              <span class="badge bg-success">Yape</span>
+              <span class="badge bg-info">Plin</span>
+            </div>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Modal de Checkout -->
+<div class="modal fade" id="modalCheckout" tabindex="-1" aria-labelledby="modalCheckoutLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title" id="modalCheckoutLabel">
+          <i class="bi bi-credit-card me-2"></i>
+          Confirmar Compra
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" [disabled]="procesandoPago"></button>
+      </div>
+      
+      <div class="modal-body">
+        <!-- Loading -->
+        <div *ngIf="cargandoDatosCheckout" class="text-center py-4">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Cargando...</span>
+          </div>
+          <p class="mt-2">Cargando información...</p>
+        </div>
+
+        <div *ngIf="!cargandoDatosCheckout">
+          <!-- Resumen del Pedido -->
+          <div class="mb-4">
+            <h6 class="border-bottom pb-2">
+              <i class="bi bi-basket me-2"></i>
+              Resumen del Pedido
+            </h6>
+            <div class="row">
+              <div class="col-6">
+                <p class="mb-1"><strong>Productos:</strong> {{ carrito.length }}</p>
+                <p class="mb-1"><strong>Subtotal:</strong> S/ {{ subtotal | number:'1.2-2' }}</p>
+                <p class="mb-1"><strong>Envío:</strong> {{ envio === 0 ? 'GRATIS' : 'S/ ' + (envio | number:'1.2-2') }}</p>
+              </div>
+              <div class="col-6">
+                <p class="mb-1"><strong>IGV (18%):</strong> S/ {{ igv | number:'1.2-2' }}</p>
+                <p class="mb-1"><strong class="text-primary fs-5">Total:</strong> <span class="text-primary fs-5">S/ {{ total | number:'1.2-2' }}</span></p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dirección de Envío -->
+          <div class="mb-4">
+            <h6 class="border-bottom pb-2">
+              <i class="bi bi-geo-alt me-2"></i>
+              Dirección de Envío
+            </h6>
+            
+            <div *ngIf="!direccionPrincipal && direcciones.length === 0" class="alert alert-warning">
+              <i class="bi bi-exclamation-triangle me-2"></i>
+              No tienes direcciones registradas. Por favor agrega una dirección de envío.
+              <button class="btn btn-warning btn-sm mt-2 w-100" (click)="irAAgregarDireccion()">
+                <i class="bi bi-plus-circle me-1"></i> Agregar Dirección
+              </button>
+            </div>
+
+            <div *ngIf="direcciones.length > 0">
+              <select class="form-select" [(ngModel)]="direccionSeleccionada">
+                <option *ngFor="let dir of direcciones" [ngValue]="dir">
+                  {{ dir.nombreDireccion }} - {{ dir.direccion }} {{ dir.numero }}, {{ dir.distrito }}
+                </option>
+              </select>
+
+              <div *ngIf="direccionSeleccionada" class="alert alert-info mt-2 small">
+                <strong>{{ direccionSeleccionada.nombreReceptor }} {{ direccionSeleccionada.apellidosReceptor }}</strong><br>
+                {{ direccionSeleccionada.direccion }} {{ direccionSeleccionada.numero }}<br>
+                {{ direccionSeleccionada.distrito }}, {{ direccionSeleccionada.provincia }}<br>
+                Tel: {{ direccionSeleccionada.telefono }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Método de Pago -->
+          <div class="mb-4">
+            <h6 class="border-bottom pb-2">
+              <i class="bi bi-credit-card me-2"></i>
+              Método de Pago
+            </h6>
+            
+            <div *ngIf="!tarjetaPredeterminada && tarjetas.length === 0" class="alert alert-warning">
+              <i class="bi bi-exclamation-triangle me-2"></i>
+              No tienes tarjetas registradas. Por favor agrega un método de pago.
+              <button class="btn btn-warning btn-sm mt-2 w-100" (click)="irAAgregarTarjeta()">
+                <i class="bi bi-plus-circle me-1"></i> Agregar Tarjeta
+              </button>
+            </div>
+
+            <div *ngIf="tarjetas.length > 0">
+              <select class="form-select" [(ngModel)]="tarjetaSeleccionada">
+                <option *ngFor="let tarjeta of tarjetas" [ngValue]="tarjeta">
+                  <img [src]="getLogo(tarjeta.tipo)" [alt]="'Logotipo de tarjeta ' + tarjeta.tipo" style="height: 20px;"> 
+                  {{ tarjeta.tipo }} - {{ tarjeta.numeroEnmascarado }} ({{ tarjeta.nombreTitular }})
+                </option>
+              </select>
+
+              <div *ngIf="tarjetaSeleccionada" class="mt-3 p-3" style="background: linear-gradient(135deg, #2c5530, #4a7c59); border-radius: 12px; color: white;">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <img [src]="getLogo(tarjetaSeleccionada.tipo)" [alt]="'Logotipo de tarjeta ' + tarjetaSeleccionada.tipo" style="height: 30px; background: white; padding: 5px; border-radius: 5px;">
+                  <span class="badge bg-warning text-dark" *ngIf="tarjetaSeleccionada.predeterminada">
+                    <i class="bi bi-star-fill"></i> Predeterminada
+                  </span>
+                </div>
+                <div class="fs-5 mb-2" style="letter-spacing: 2px;">
+                  {{ tarjetaSeleccionada.numeroEnmascarado }}
+                </div>
+                <div class="row">
+                  <div class="col-8">
+                    <small style="opacity: 0.8;">TITULAR</small><br>
+                    <span style="font-size: 0.9rem;">{{ tarjetaSeleccionada.nombreTitular }}</span>
+                  </div>
+                  <div class="col-4 text-end">
+                    <small style="opacity: 0.8;">EXPIRA</small><br>
+                    <span style="font-size: 0.9rem;">{{ tarjetaSeleccionada.mesExpiracion.toString().padStart(2, '0') }}/{{ tarjetaSeleccionada.anioExpiracion.toString().slice(-2) }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Información de Seguridad -->
+          <div class="alert alert-info small">
+            <i class="bi bi-shield-lock me-2"></i>
+            <strong>Compra segura:</strong> Tus datos están protegidos con encriptación SSL de 256 bits.
+          </div>
+        </div>
+      </div>
+      
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" [disabled]="procesandoPago">
+          Cancelar
+        </button>
+        <button type="button" 
+                class="btn btn-success btn-lg" 
+                (click)="confirmarPago()"
+                [disabled]="procesandoPago || !direccionSeleccionada || !tarjetaSeleccionada">
+          <span *ngIf="procesandoPago" class="spinner-border spinner-border-sm me-2"></span>
+          <i class="bi bi-check-circle me-2" *ngIf="!procesandoPago"></i>
+          {{ procesandoPago ? 'Procesando...' : 'Confirmar Compra' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

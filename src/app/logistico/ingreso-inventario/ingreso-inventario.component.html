@@ -1,0 +1,298 @@
+<div class="container-fluid">
+  <!-- Header -->
+  <div class="row bg-primary text-white py-3">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <h3 class="mb-0">
+            <i class="bi bi-plus-circle me-2"></i>
+            Ingreso de Inventario
+          </h3>
+          <small>Registro de nuevos productos y actualización de stock</small>
+        </div>
+        <div>
+          <button class="btn btn-outline-light me-2" (click)="cancelar()">
+            <i class="bi bi-arrow-left me-1"></i> Volver
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container mt-4">
+    <div class="row">
+      <!-- Formulario Principal -->
+      <div class="col-md-8">
+        <!-- Selección de Proveedor -->
+        <div class="card mb-4">
+          <div class="card-header bg-light">
+            <h5 class="mb-0">1. Selección de Proveedor</h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6">
+                <label class="form-label">Proveedor *</label>
+                <select class="form-select" [(ngModel)]="proveedorSeleccionado" 
+                        (change)="onProveedorChange(proveedorSeleccionado?.id || 0)">
+                  <option [ngValue]="null">Seleccione un proveedor</option>
+                  <option *ngFor="let prov of proveedores" [ngValue]="prov">
+                    {{ prov.nombre }} - {{ prov.materialEspecialidad }}
+                  </option>
+                </select>
+              </div>
+              <div class="col-md-6" *ngIf="proveedorSeleccionado">
+                <label class="form-label">Información del Proveedor</label>
+                <div class="alert alert-info py-2">
+                  <small>
+                    <strong>Contacto:</strong> {{ proveedorSeleccionado.contacto }}<br>
+                    <strong>Teléfono:</strong> {{ proveedorSeleccionado.telefono }}<br>
+                    <strong>Especialidad:</strong> {{ proveedorSeleccionado.materialEspecialidad }}
+                  </small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Selección de Producto -->
+        <div class="card mb-4" *ngIf="proveedorSeleccionado">
+          <div class="card-header bg-light">
+            <h5 class="mb-0">2. Selección de Producto</h5>
+          </div>
+          <div class="card-body">
+            <div class="row mb-3">
+              <div class="col-12">
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" id="productoExistente" 
+                         [(ngModel)]="productoExistente" [value]="true">
+                  <label class="form-check-label" for="productoExistente">
+                    Producto Existente
+                  </label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" id="productoNuevo" 
+                         [(ngModel)]="productoExistente" [value]="false">
+                  <label class="form-check-label" for="productoNuevo">
+                    Nuevo Producto
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Producto Existente -->
+            <div *ngIf="productoExistente">
+              <div class="row">
+                <div class="col-md-6">
+                  <label class="form-label">Producto *</label>
+                  <select class="form-select" [(ngModel)]="productoSeleccionado" 
+                          (change)="onProductoChange(productoSeleccionado?.id || 0)">
+                    <option [ngValue]="null">Seleccione un producto</option>
+                    <option *ngFor="let prod of productosDelProveedor" [ngValue]="prod">
+                      {{ prod.nombre }} - S/ {{ prod.precioCompra }}
+                    </option>
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">Cantidad *</label>
+                  <input type="number" class="form-control" [(ngModel)]="nuevoProducto.stock" min="1">
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">Precio Compra *</label>
+                  <input type="number" class="form-control" [(ngModel)]="nuevoProducto.precioCompra" step="0.01" min="0">
+                </div>
+              </div>
+            </div>
+
+            <!-- Nuevo Producto -->
+            <div *ngIf="!productoExistente">
+              <div class="row">
+                <div class="col-md-6">
+                  <label class="form-label">Nombre del Producto *</label>
+                  <input type="text" class="form-control" [(ngModel)]="nuevoProducto.nombre" 
+                         placeholder="Ej: Mesa de Pino para 6 personas">
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">Cantidad *</label>
+                  <input type="number" class="form-control" [(ngModel)]="nuevoProducto.stock" min="1">
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">Precio Compra *</label>
+                  <input type="number" class="form-control" [(ngModel)]="nuevoProducto.precioCompra" step="0.01" min="0">
+                </div>
+              </div>
+              
+              <div class="row mt-2">
+                <div class="col-md-4">
+                  <label class="form-label">Categoría</label>
+                  <select class="form-select" [(ngModel)]="nuevoProducto.categoria">
+                    <option value="">Seleccione categoría</option>
+                    <option *ngFor="let cat of categorias" [value]="cat.nombre">
+                      {{ cat.nombre }}
+                    </option>
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Material</label>
+                  <input type="text" class="form-control" [(ngModel)]="nuevoProducto.material" 
+                         placeholder="Ej: Madera Pino, Plástico, etc.">
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Color</label>
+                  <input type="text" class="form-control" [(ngModel)]="nuevoProducto.color" 
+                         placeholder="Ej: Natural, Negro, Blanco">
+                </div>
+              </div>
+
+              <div class="row mt-2">
+                <div class="col-md-6">
+                  <label class="form-label">Dimensiones</label>
+                  <input type="text" class="form-control" [(ngModel)]="nuevoProducto.dimensiones" 
+                         placeholder="Ej: 1.20m x 0.80m x 0.75m">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Precio Venta</label>
+                  <input type="number" class="form-control" [(ngModel)]="nuevoProducto.precioVenta" 
+                         step="0.01" min="0" placeholder="Se calculará automáticamente">
+                </div>
+              </div>
+
+              <div class="row mt-2">
+                <div class="col-12">
+                  <label class="form-label">Características</label>
+                  <textarea class="form-control" [(ngModel)]="nuevoProducto.caracteristicas" 
+                            rows="2" placeholder="Ej: Patas reforzadas, superficie lisa, etc."></textarea>
+                </div>
+              </div>
+            </div>
+
+            <div class="row mt-3">
+              <div class="col-12">
+                <button class="btn btn-success" (click)="agregarProducto()">
+                  <i class="bi bi-plus-circle me-1"></i>
+                  Agregar Producto
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Productos Agregados -->
+        <div class="card mb-4" *ngIf="productosIngreso.length > 0">
+          <div class="card-header bg-light">
+            <h5 class="mb-0">3. Productos a Ingresar</h5>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th>Producto</th>
+                    <th>Cantidad</th>
+                    <th>Precio Compra</th>
+                    <th>Subtotal</th>
+                    <th>Acción</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let detalle of productosIngreso; let i = index">
+                    <td>{{ detalle.producto.nombre }}</td>
+                    <td>{{ detalle.cantidad }}</td>
+                    <td>S/ {{ detalle.precioCompra | number:'1.2-2' }}</td>
+                    <td>S/ {{ detalle.subtotal | number:'1.2-2' }}</td>
+                    <td>
+                      <button class="btn btn-sm btn-danger" (click)="eliminarProducto(i)">
+                        <i class="bi bi-trash"></i>
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel Lateral - Detalles de Factura y Resumen -->
+      <div class="col-md-4">
+        <!-- Detalles de Factura -->
+        <div class="card mb-4">
+          <div class="card-header bg-light">
+            <h5 class="mb-0">Detalles de Factura</h5>
+          </div>
+          <div class="card-body">
+            <div class="mb-3">
+              <label class="form-label">Número de Factura *</label>
+              <input type="text" class="form-control" [(ngModel)]="factura.numeroFactura" 
+                     placeholder="Ej: F001-12345">
+            </div>
+            
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label class="form-label">Fecha Emisión</label>
+                <input type="date" class="form-control" [(ngModel)]="factura.fechaEmision">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Fecha Ingreso</label>
+                <input type="date" class="form-control" [(ngModel)]="factura.fechaIngreso">
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Método de Pago *</label>
+              <select class="form-select" [(ngModel)]="factura.metodoPago" (change)="onMetodoPagoChange()">
+                <option value="contado">Al Contado</option>
+                <option value="credito">Al Crédito</option>
+              </select>
+            </div>
+
+            <div *ngIf="factura.metodoPago === 'credito'" class="row mb-3">
+              <div class="col-md-6">
+                <label class="form-label">Días de Crédito</label>
+                <input type="number" class="form-control" [(ngModel)]="factura.diasCredito" 
+                       (change)="onDiasCreditoChange()" min="1" max="360">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Fecha de Pago</label>
+                <input type="date" class="form-control" [(ngModel)]="factura.fechaPago" readonly>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Resumen de Compra -->
+        <div class="card mb-4">
+          <div class="card-header bg-light">
+            <h5 class="mb-0">Resumen de Compra</h5>
+          </div>
+          <div class="card-body">
+            <div class="d-flex justify-content-between mb-2">
+              <span>Subtotal:</span>
+              <strong>S/ {{ subtotal | number:'1.2-2' }}</strong>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+              <span>IGV (18%):</span>
+              <strong>S/ {{ igv | number:'1.2-2' }}</strong>
+            </div>
+            <hr>
+            <div class="d-flex justify-content-between mb-3">
+              <span class="fs-5">Total:</span>
+              <strong class="fs-5 text-primary">S/ {{ total | number:'1.2-2' }}</strong>
+            </div>
+
+            <div class="d-grid gap-2">
+              <button class="btn btn-primary" (click)="guardarIngreso()" 
+                      [disabled]="productosIngreso.length === 0 || !factura.numeroFactura">
+                <i class="bi bi-check-circle me-1"></i>
+                Guardar Ingreso
+              </button>
+              <button class="btn btn-outline-secondary" (click)="limpiarFormulario()">
+                <i class="bi bi-arrow-clockwise me-1"></i>
+                Limpiar Todo
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

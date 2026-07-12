@@ -1,0 +1,324 @@
+<app-header></app-header>
+<div class="principal-container">
+  <!-- Banner Principal -->
+  <section class="hero-banner">
+    <div class="banner-content">
+      <h1>NOGAL MUEBLES</h1>
+      <h2>70% dcto. | OUTLET MUEBLES</h2>
+      <button class="btn btn-warning btn-lg" (click)="scrollToProducts()">
+        Quiero ver todo
+      </button>
+    </div>
+  </section>
+
+  <!-- Categorías Populares -->
+  <section class="categories-section">
+    <h3>CATEGORÍAS POPULARES</h3>
+    <div class="categories-grid">
+      <div class="category-card" *ngFor="let category of categoriasPopulares" 
+           (click)="filtrarPorCategoria(category.nombre)">
+        <div class="category-icon">
+          <i [class]="category.icono"></i>
+        </div>
+        <span>{{ category.nombre }}</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Layout Principal -->
+  <div class="main-layout">
+    <!-- Sidebar de Filtros -->
+    <aside class="filters-sidebar">
+      <div class="filter-section">
+        <h5>FILTROS</h5>
+        
+        <!-- Búsqueda -->
+        <div class="filter-group">
+          <label>Buscar producto</label>
+          <input type="text" class="form-control" 
+                 [(ngModel)]="filtroTexto"
+                 (input)="aplicarFiltros()"
+                 placeholder="Nombre del producto...">
+        </div>
+
+        <!-- Categoría -->
+        <div class="filter-group">
+          <label>Categoría</label>
+          <select class="form-select" 
+                  [(ngModel)]="filtroCategoria"
+                  (change)="aplicarFiltros()">
+            <option value="">Todas las categorías</option>
+            <option *ngFor="let cat of categorias" [value]="cat.nombre">
+              {{ cat.nombre }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Material -->
+        <div class="filter-group">
+          <label>Material</label>
+          <select class="form-select" 
+                  [(ngModel)]="filtroMaterial"
+                  (change)="aplicarFiltros()">
+            <option value="">Todos los materiales</option>
+            <option *ngFor="let material of materiales" [value]="material">
+              {{ material }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Precio -->
+        <div class="filter-group">
+          <label>Precio máximo: S/ {{ filtroPrecioMax }}</label>
+          <input type="range" class="form-range" 
+                 min="0" max="2000" step="50"
+                 [(ngModel)]="filtroPrecioMax"
+                 (change)="aplicarFiltros()">
+          <div class="price-labels">
+            <span>S/ 0</span>
+            <span>S/ 2000</span>
+          </div>
+        </div>
+
+        <!-- Ofertas -->
+        <div class="filter-group">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" 
+                   [(ngModel)]="filtroOfertas"
+                   (change)="aplicarFiltros()"
+                   id="filtroOfertas">
+            <label class="form-check-label" for="filtroOfertas">
+              Solo ofertas
+            </label>
+          </div>
+        </div>
+
+        <!-- Stock -->
+        <div class="filter-group">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" 
+                   [(ngModel)]="filtroEnStock"
+                   (change)="aplicarFiltros()"
+                   id="filtroEnStock" checked>
+            <label class="form-check-label" for="filtroEnStock">
+              Solo productos en stock
+            </label>
+          </div>
+        </div>
+
+        <button class="btn btn-outline-secondary btn-sm w-100 mt-3" 
+                (click)="limpiarFiltros()">
+          <i class="bi bi-arrow-clockwise"></i> Limpiar filtros
+        </button>
+      </div>
+    </aside>
+
+    <!-- Contenido Principal -->
+    <main class="products-main">
+      <!-- Header de Productos -->
+      <div class="products-header">
+        <div>
+          <h4>PRODUCTOS DESTACADOS</h4>
+          <small class="text-muted">
+            Mostrando {{ productosFiltrados.length }} de {{ productos.length }} productos
+          </small>
+        </div>
+        <div class="sort-options">
+          <select class="form-select" [(ngModel)]="ordenamiento" (change)="aplicarFiltros()">
+            <option value="nombre">Ordenar por nombre</option>
+            <option value="precio-asc">Precio: menor a mayor</option>
+            <option value="precio-desc">Precio: mayor a menor</option>
+            <option value="stock-desc">Mayor stock primero</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Loading -->
+      <div *ngIf="cargando" class="loading-container">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Cargando...</span>
+        </div>
+        <p>Cargando productos...</p>
+      </div>
+
+      <!-- Grid de Productos -->
+      <div *ngIf="!cargando" class="products-grid">
+        <div class="product-card" *ngFor="let producto of productosFiltrados">
+          <div class="product-image">
+            <img [src]="getProductImage(producto)" [alt]="'Fotografía del producto ' + producto.nombre" (error)="handleImageError($event)">
+            <div class="product-badges">
+              <span class="discount-badge" *ngIf="esProductoOferta(producto)">
+                OFERTA
+              </span>
+              <span class="stock-badge" [ngClass]="getStockBadgeClass(producto.stock)">
+                {{ getStockText(producto.stock) }}
+              </span>
+            </div>
+            <button class="btn-wishlist" title="Agregar a favoritos">
+              <i class="bi bi-heart"></i>
+            </button>
+          </div>
+          
+          <div class="product-info">
+            <h6 class="product-name" [title]="producto.nombre">
+              {{ producto.nombre }}
+            </h6>
+            
+            <div class="product-meta">
+              <span class="product-category">{{ producto.categoria?.nombre }}</span>
+              <span class="product-material" *ngIf="producto.material">
+                • {{ producto.material }}
+              </span>
+            </div>
+
+            <div class="product-pricing">
+              <span class="current-price">S/ {{ producto.precioVenta | number:'1.2-2' }}</span>
+              <span class="original-price" *ngIf="esProductoOferta(producto)">
+                S/ {{ (producto.precioVenta / 0.7) | number:'1.2-2' }}
+              </span>
+            </div>
+
+            <div class="product-shipping">
+              <span class="badge-free" *ngIf="tieneEnvioGratis(producto)">
+                <i class="bi bi-truck"></i> ENVÍO GRATIS
+              </span>
+              <span class="badge-fast" *ngIf="producto.stock > 10">
+                <i class="bi bi-lightning"></i> DISPONIBLE
+              </span>
+            </div>
+
+            <div class="product-actions">
+              <button class="btn-add-cart" 
+                      (click)="agregarAlCarrito(producto)"
+                      [disabled]="producto.stock === 0">
+                <i class="bi bi-cart-plus"></i> 
+                {{ producto.stock === 0 ? 'SIN STOCK' : 'AGREGAR AL CARRITO' }}
+              </button>
+              <button class="btn-view-details" title="Ver detalles"
+                      [attr.aria-label]="'Ver detalles de ' + producto.nombre"
+                      (click)="verDetallesProducto(producto)">
+                <i class="bi bi-eye" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sin resultados -->
+      <div *ngIf="!cargando && productosFiltrados.length === 0" class="no-results">
+        <i class="bi bi-search" style="font-size: 3rem;"></i>
+        <h5>No se encontraron productos</h5>
+        <p>Intenta ajustar los filtros de búsqueda</p>
+        <button class="btn btn-primary" (click)="limpiarFiltros()">
+          <i class="bi bi-arrow-clockwise"></i> Mostrar todos los productos
+        </button>
+      </div>
+    </main>
+  </div>
+
+  <!-- Sección "Todo a menos de S/199" -->
+  <section class="budget-section" *ngIf="productosEconomicos.length > 0">
+    <div class="section-header">
+      <h3>TODO A MENOS DE S/199</h3>
+      <p>Productos económicos con la mejor calidad</p>
+    </div>
+    <div class="budget-products">
+      <div class="budget-product" *ngFor="let producto of productosEconomicos">
+        <div class="budget-image">
+          <img [src]="getProductImage(producto)" [alt]="'Fotografía del producto ' + producto.nombre">
+        </div>
+        <div class="budget-info">
+          <span class="budget-name">{{ acortarNombre(producto.nombre, 25) }}</span>
+          <span class="budget-price">S/ {{ producto.precioVenta | number:'1.2-2' }}</span>
+          <span class="badge-free">ENVÍO GRATIS</span>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- Modal de detalles de producto -->
+<div class="detalle-overlay" *ngIf="productoDetalle || errorDetalle"
+     (click)="cerrarDetalles()" role="dialog" aria-modal="true"
+     [attr.aria-label]="productoDetalle ? 'Detalles de ' + productoDetalle.nombre : 'Error de detalles'">
+  <div class="detalle-modal veta-top" (click)="$event.stopPropagation()">
+    <button class="detalle-cerrar" (click)="cerrarDetalles()" aria-label="Cerrar detalles">
+      <i class="bi bi-x-lg" aria-hidden="true"></i>
+    </button>
+
+    <!-- Error: sin datos -->
+    <div *ngIf="errorDetalle && !productoDetalle" class="detalle-error" role="alert">
+      <i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>
+      <p>{{ errorDetalle }}</p>
+    </div>
+
+    <div *ngIf="productoDetalle" class="detalle-grid">
+      <div class="detalle-imagen">
+        <img [src]="getProductImage(productoDetalle)"
+             [alt]="'Fotografía del producto ' + productoDetalle.nombre"
+             (error)="handleImageError($event)">
+        <span class="discount-badge" *ngIf="esProductoOferta(productoDetalle)">OFERTA</span>
+      </div>
+
+      <div class="detalle-info">
+        <span class="detalle-categoria">{{ productoDetalle.categoria?.nombre || 'Sin categoría' }}</span>
+        <h3 class="detalle-nombre">{{ productoDetalle.nombre }}</h3>
+
+        <div class="detalle-precio">
+          <span class="detalle-precio-actual">S/ {{ productoDetalle.precioVenta | number:'1.2-2' }}</span>
+          <span class="detalle-precio-original" *ngIf="esProductoOferta(productoDetalle)">
+            S/ {{ (productoDetalle.precioVenta / 0.7) | number:'1.2-2' }}
+          </span>
+        </div>
+
+        <p class="detalle-descripcion" *ngIf="productoDetalle.descripcion; else sinDescripcion">
+          {{ productoDetalle.descripcion }}
+        </p>
+        <ng-template #sinDescripcion>
+          <p class="detalle-descripcion detalle-sin-dato">Este producto aún no tiene descripción disponible.</p>
+        </ng-template>
+
+        <ul class="detalle-specs">
+          <li *ngIf="productoDetalle.material">
+            <i class="bi bi-tree" aria-hidden="true"></i>
+            <span><strong>Material:</strong> {{ productoDetalle.material }}</span>
+          </li>
+          <li *ngIf="productoDetalle.dimensiones">
+            <i class="bi bi-rulers" aria-hidden="true"></i>
+            <span><strong>Dimensiones:</strong> {{ productoDetalle.dimensiones }}</span>
+          </li>
+          <li *ngIf="productoDetalle.color">
+            <i class="bi bi-palette" aria-hidden="true"></i>
+            <span><strong>Color:</strong> {{ productoDetalle.color }}</span>
+          </li>
+          <li *ngIf="productoDetalle.caracteristicas">
+            <i class="bi bi-card-checklist" aria-hidden="true"></i>
+            <span><strong>Características:</strong> {{ productoDetalle.caracteristicas }}</span>
+          </li>
+          <li>
+            <i class="bi bi-box-seam" aria-hidden="true"></i>
+            <span><strong>Disponibilidad:</strong> {{ getStockText(productoDetalle.stock) }}
+              <ng-container *ngIf="productoDetalle.stock > 0">({{ productoDetalle.stock }} unidades)</ng-container>
+            </span>
+          </li>
+          <li *ngIf="tieneEnvioGratis(productoDetalle)">
+            <i class="bi bi-truck" aria-hidden="true"></i>
+            <span><strong>Envío:</strong> gratis en Lima</span>
+          </li>
+        </ul>
+
+        <div class="detalle-acciones">
+          <button class="btn btn-primary btn-lg"
+                  (click)="agregarDesdeDetalles()"
+                  [disabled]="productoDetalle.stock === 0">
+            <i class="bi bi-cart-plus" aria-hidden="true"></i>
+            {{ productoDetalle.stock === 0 ? 'Sin stock' : 'Agregar al carrito' }}
+          </button>
+          <button class="btn btn-outline-primary btn-lg" (click)="cerrarDetalles()">
+            Seguir viendo
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

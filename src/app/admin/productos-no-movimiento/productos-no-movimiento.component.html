@@ -1,0 +1,328 @@
+<!-- src/app/admin/productos-no-movimiento/productos-no-movimiento.component.html -->
+<div class="admin-panel">
+  <!-- Header -->
+  <header class="admin-header sticky-top p-3">
+    <div class="container-fluid">
+      <div class="d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center">
+          <button class="btn btn-outline-admin me-3" (click)="navegarAPanelAdmin()">
+            <i class="bi bi-arrow-left"></i>
+          </button>
+          <h4 class="mb-0">
+            <i class="bi bi-box-seam me-2"></i>
+            Productos Sin Movimiento
+          </h4>
+        </div>
+        
+        <div class="d-flex gap-2">
+          <button class="btn btn-outline-admin" (click)="exportarReporte()" 
+                  [disabled]="cargandoDatos || productosSinMovimiento.length === 0">
+            <i class="bi bi-download me-2"></i>Exportar
+          </button>
+          <button class="btn btn-primary-admin" (click)="cargarDatos()" [disabled]="cargandoDatos">
+            <span *ngIf="cargandoDatos" class="spinner-border spinner-border-sm me-2"></span>
+            <i class="bi bi-arrow-clockwise me-2" *ngIf="!cargandoDatos"></i>
+            {{ cargandoDatos ? 'Actualizando...' : 'Actualizar' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Contenido Principal -->
+  <main class="container-fluid py-4">
+    
+    <!-- Filtros -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card-filtros">
+          <div class="card-header-filtros">
+            <h5 class="mb-0"><i class="bi bi-funnel me-2"></i>Filtros</h5>
+          </div>
+          <div class="card-body-filtros">
+            <div class="row">
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Días sin venta:</label>
+                <div class="input-group">
+                  <input type="number" class="form-control" 
+                         [(ngModel)]="filtros.diasSinMovimiento" 
+                         min="1" max="365" [disabled]="cargandoDatos">
+                  <span class="input-group-text">días</span>
+                </div>
+                <small class="text-muted">Productos sin ventas en los últimos X días</small>
+              </div>
+              
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Stock mínimo:</label>
+                <div class="input-group">
+                  <input type="number" class="form-control" 
+                         [(ngModel)]="filtros.stockMinimo" 
+                         min="1" [disabled]="cargandoDatos">
+                  <span class="input-group-text">unidades</span>
+                </div>
+                <small class="text-muted">Filtrar productos con stock mayor a</small>
+              </div>
+              
+              <div class="col-md-4 mb-3 d-flex align-items-end">
+                <div class="d-flex gap-2 w-100">
+                  <button class="btn btn-primary-admin flex-grow-1" 
+                          (click)="aplicarFiltros()" 
+                          [disabled]="cargandoDatos">
+                    <span *ngIf="cargandoDatos" class="spinner-border spinner-border-sm me-2"></span>
+                    <i class="bi bi-search me-2" *ngIf="!cargandoDatos"></i>
+                    {{ cargandoDatos ? 'Aplicando...' : 'Aplicar Filtros' }}
+                  </button>
+                  <button class="btn btn-outline-admin" 
+                          (click)="limpiarFiltros()" 
+                          [disabled]="cargandoDatos">
+                    <i class="bi bi-x-circle"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Indicador de carga general -->
+    <div *ngIf="cargando" class="row mb-4">
+      <div class="col-12">
+        <div class="text-center py-5">
+          <div class="spinner-border text-warning" style="width: 3rem; height: 3rem;" role="status">
+            <span class="visually-hidden">Cargando...</span>
+          </div>
+          <h5 class="mt-3 text-white">Cargando análisis de productos...</h5>
+          <p class="text-muted">Obteniendo datos de productos y ventas</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contenido cuando no está cargando -->
+    <div *ngIf="!cargando">
+      <!-- Estadísticas -->
+      <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+          <div class="metric-card">
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                <div class="metric-value">{{ formatearNumero(estadisticas.totalProductosSinMovimiento) }}</div>
+                <div class="metric-label">Productos Sin Movimiento</div>
+                <small class="text-muted">Sin ventas en {{ filtros.diasSinMovimiento }} días</small>
+              </div>
+              <i class="bi bi-box-seam fs-2 text-danger"></i>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6 mb-4">
+          <div class="metric-card">
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                <div class="metric-value">{{ formatearNumero(estadisticas.stockAcumulado) }}</div>
+                <div class="metric-label">Stock Acumulado</div>
+                <small class="text-muted">Total de unidades</small>
+              </div>
+              <i class="bi bi-boxes fs-2 text-warning"></i>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6 mb-4">
+          <div class="metric-card">
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                <div class="metric-value">{{ formatearMoneda(estadisticas.valorInventario) }}</div>
+                <div class="metric-label">Valor del Inventario</div>
+                <small class="text-muted">{{ formatearPorcentaje(estadisticas.porcentajeInventario) }} del total</small>
+              </div>
+              <i class="bi bi-currency-dollar fs-2 text-success"></i>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6 mb-4">
+          <div class="metric-card">
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                <div class="metric-value">{{ formatearNumero(estadisticas.diasPromedioSinVenta) }}</div>
+                <div class="metric-label">Días sin Venta</div>
+                <small class="text-muted">Promedio sin movimiento</small>
+              </div>
+              <i class="bi bi-calendar-x fs-2 text-info"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gráfico -->
+      <div class="row mb-4">
+        <div class="col-12">
+          <div class="chart-container">
+            <div class="chart-header">
+              <h5 class="chart-title">Top 10 Productos Sin Movimiento (Mayor valor de inventario)</h5>
+              <div class="text-muted small">
+                <i class="bi bi-info-circle me-1"></i>
+                Barras: Valor del inventario | Línea: Días sin venta
+              </div>
+            </div>
+            
+            <!-- Indicador de carga del gráfico -->
+            <div *ngIf="chartLoading" class="text-center py-5">
+              <div class="spinner-border text-warning" role="status">
+                <span class="visually-hidden">Cargando gráfico...</span>
+              </div>
+              <p class="mt-2 text-muted">Generando visualización...</p>
+            </div>
+            
+            <!-- Gráfico ECharts -->
+            <div *ngIf="isChartReady && !chartLoading" style="height: 400px; position: relative;">
+              <div echarts 
+                  [options]="chartOption" 
+                  (chartInit)="onChartInit($event)"
+                  [autoResize]="true"
+                  class="echarts-tendencia">
+              </div>
+              
+              <div *ngIf="productosSinMovimiento.length === 0" class="chart-info-badge">
+                <span class="badge bg-success">
+                  <i class="bi bi-check-circle me-1"></i>
+                  ¡Todos los productos tienen movimiento!
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lista de Productos -->
+      <div class="row">
+        <div class="col-12">
+          <div class="chart-container">
+            <div class="chart-header d-flex justify-content-between align-items-center">
+              <div>
+                <h5 class="chart-title">Detalle de Productos Sin Movimiento</h5>
+                <div class="text-muted">
+                  Mostrando {{ productosSinMovimiento.length }} productos sin ventas en los últimos {{ filtros.diasSinMovimiento }} días
+                </div>
+              </div>
+              <div class="text-warning">
+                <i class="bi bi-cash-stack me-1"></i>
+                Valor total: {{ formatearMoneda(estadisticas.valorInventario) }}
+              </div>
+            </div>
+            
+            <div *ngIf="cargandoDatos" class="text-center py-4">
+              <div class="spinner-border text-warning" role="status">
+                <span class="visually-hidden">Cargando...</span>
+              </div>
+              <p class="mt-2 text-muted">Actualizando lista de productos...</p>
+            </div>
+            
+            <div *ngIf="!cargandoDatos">
+              <div class="table-responsive">
+                <table class="table table-hover pedidos-table">
+                  <thead>
+                    <tr>
+                      <th>Producto</th>
+                      <th>Categoría</th>
+                      <th>Stock</th>
+                      <th>Última Venta</th>
+                      <th>Total Vendido</th>
+                      <th>Días sin venta</th>
+                      <th>Valor Inventario</th>
+                      <th>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let producto of productosSinMovimiento" 
+                        [class.table-danger-light]="producto.stock < filtros.stockMinimo"
+                        class="animate-fade-in-up">
+                      <td>
+                        <div class="d-flex align-items-center">
+                          <div class="producto-icon me-2">
+                            <i class="bi bi-box-seam"></i>
+                          </div>
+                          <div>
+                            <strong>{{ producto.nombre }}</strong><br/>
+                            <small class="text-muted">ID: {{ producto.id }}</small>
+                          </div>
+                        </div>
+                      </td>
+                      <td>{{ producto.categoria?.nombre || 'Sin categoría' }}</td>
+                      <td>
+                        <span [class]="producto.stock < filtros.stockMinimo ? 'badge bg-danger' : 'badge bg-secondary'">
+                          {{ producto.stock }} unidades
+                        </span>
+                      </td>
+                      <td>
+                        <span class="text-danger">
+                          <i class="bi bi-calendar-x me-1"></i>
+                          {{ obtenerUltimaVentaTexto(producto.id) }}
+                        </span>
+                      </td>
+                      <td>
+                        <span class="text-warning">
+                          {{ obtenerTotalVendido(producto.id) }} unidades
+                        </span>
+                      </td>
+                      <td>
+                        <span class="badge" 
+                              [class.bg-danger]="obtenerDiasSinVenta(producto.id) > 90"
+                              [class.bg-warning]="obtenerDiasSinVenta(producto.id) > 60 && obtenerDiasSinVenta(producto.id) <= 90"
+                              [class.bg-info]="obtenerDiasSinVenta(producto.id) <= 60">
+                          {{ obtenerDiasSinVenta(producto.id) }} días
+                        </span>
+                      </td>
+                      <td>
+                        <strong class="text-success">
+                          {{ formatearMoneda((producto.precioCompra || producto.precioVenta * 0.7) * producto.stock) }}
+                        </strong>
+                      </td>
+                      <td>
+                        <button class="btn btn-sm btn-outline-admin me-1" 
+                                (click)="verDetalleProducto(producto)"
+                                title="Ver detalle"
+                                [disabled]="cargandoDatos">
+                          <i class="bi bi-eye"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger" 
+                                title="Marcar para revisión"
+                                [disabled]="cargandoDatos">
+                          <i class="bi bi-flag"></i>
+                        </button>
+                      </td>
+                    </tr>
+                    <tr *ngIf="productosSinMovimiento.length === 0">
+                      <td colspan="8" class="text-center text-muted py-4">
+                        <i class="bi bi-check-circle fs-1 d-block mb-2 text-success"></i>
+                        <h5 class="text-success">¡Excelente gestión de inventario!</h5>
+                        <p class="mb-0">Todos los productos han tenido ventas en los últimos {{ filtros.diasSinMovimiento }} días.</p>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recomendaciones -->
+      <div *ngIf="productosSinMovimiento.length > 0" class="row mt-4">
+        <div class="col-12">
+          <div class="alert alert-warning">
+            <h6><i class="bi bi-lightbulb me-2"></i>Acciones Recomendadas</h6>
+            <ul class="mb-0">
+              <li><strong>Productos con stock alto:</strong> Crear promociones o paquetes especiales</li>
+              <li><strong>Productos nunca vendidos:</strong> Revisar precio, descripción e imágenes</li>
+              <li><strong>Productos con 60+ días sin venta:</strong> Considerar descuentos del 20-30%</li>
+              <li><strong>Productos con 90+ días sin venta:</strong> Evaluar discontinuación</li>
+              <li><strong>Productos con stock bajo mínimo:</strong> Revisar si vale la pena reponer</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>

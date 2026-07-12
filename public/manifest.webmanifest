@@ -1,0 +1,14 @@
+{
+  "name": "Nogal ERP — Comercial El Nogal",
+  "short_name": "Nogal ERP",
+  "description": "Plataforma comercial de Comercial El Nogal: tienda, CRM, cotizaciones, BI y logística.",
+  "lang": "es",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F7F6F2",
+  "theme_color": "#2E5B34",
+  "icons": [
+    { "src": "/img/favicon.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/img/favicon.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

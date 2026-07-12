@@ -1,0 +1,219 @@
+/* Tarjetas de Dirección */
+.direccion-card {
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s ease;
+  position: relative;
+  cursor: default;
+}
+
+.direccion-card:hover {
+  border-color: var(--brand);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* Tarjeta de Agregar */
+.direccion-card-add {
+  border: 2px dashed #6c757d;
+  cursor: pointer;
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.direccion-card-add:hover {
+  border-color: var(--brand);
+  background-color: var(--surface-2);
+}
+
+.direccion-card-add .direccion-card-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-2);
+}
+
+.direccion-card-add .direccion-card-content i {
+  font-size: 3rem;
+  color: var(--brand);
+}
+
+.direccion-card-add .direccion-card-content span {
+  font-weight: 500;
+  font-size: 1.1rem;
+}
+
+/* Dirección Principal */
+.direccion-principal {
+  border-color: #ffc107;
+  background: linear-gradient(to bottom, #fff9e6 0%, #ffffff 100%);
+}
+
+/* Badge Principal */
+.badge-principal {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #ffc107;
+  color: #000;
+  padding: 4px 10px;
+  border-radius: 15px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+}
+
+/* Header de la Tarjeta */
+.direccion-card-header {
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+.direccion-card-header h6 {
+  color: var(--brand);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+}
+
+/* Body de la Tarjeta */
+.direccion-card-body {
+  flex: 1;
+  margin-bottom: 15px;
+}
+
+.direccion-card-body p {
+  margin-bottom: 8px;
+}
+
+/* Footer de la Tarjeta */
+.direccion-card-footer {
+  display: flex;
+  gap: 8px;
+  padding-top: 15px;
+  border-top: 1px solid var(--border);
+}
+
+.direccion-card-footer .btn {
+  flex: 1;
+}
+
+/* Modal */
+.modal-header {
+  background-color: var(--surface-2);
+  border-bottom: 1px solid var(--border);
+}
+
+.form-label {
+  font-weight: 500;
+  color: var(--text-2);
+  margin-bottom: 0.5rem;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 0.2rem rgba(44, 85, 48, 0.25);
+}
+
+/* Breadcrumb */
+.breadcrumb {
+  background: transparent;
+  padding: 0;
+  margin: 0;
+}
+
+.breadcrumb-item a {
+  color: var(--brand);
+  text-decoration: none;
+}
+
+.breadcrumb-item.active {
+  color: var(--text-2);
+}
+
+/* Alert */
+.alert-info {
+  background-color: var(--info-soft);
+  border-color: #bee5eb;
+  color: var(--info);
+  border-radius: 8px;
+}
+
+/* Card */
+.card {
+  border: none;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  border-radius: 10px;
+}
+
+.card-header {
+  border-radius: 10px 10px 0 0 !important;
+  font-weight: 600;
+}
+
+/* Botones */
+.btn-primary {
+  background-color: var(--brand);
+  border-color: var(--brand);
+}
+
+.btn-primary:hover {
+  background-color: #244428;
+  border-color: #244428;
+}
+
+.btn-outline-primary {
+  color: var(--brand);
+  border-color: var(--brand);
+}
+
+.btn-outline-primary:hover {
+  background-color: var(--brand);
+  border-color: var(--brand);
+  color: white;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .direccion-card {
+    margin-bottom: 15px;
+  }
+  
+  .modal-dialog {
+    margin: 10px;
+  }
+  
+  .direccion-card-footer {
+    flex-direction: column;
+  }
+  
+  .direccion-card-footer .btn {
+    width: 100%;
+  }
+}
+
+/* Animaciones */
+.fade-in {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Loading */
+.spinner-border {
+  width: 1rem;
+  height: 1rem;
+}

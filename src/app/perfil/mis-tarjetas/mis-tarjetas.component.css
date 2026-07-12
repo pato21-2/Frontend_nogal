@@ -1,0 +1,336 @@
+/* Contenedor principal */
+.container-fluid {
+  background-color: var(--surface-2);
+  min-height: 100vh;
+}
+
+/* Header con breadcrumb */
+.breadcrumb {
+  background-color: transparent;
+  padding: 0;
+}
+
+.breadcrumb-item a {
+  color: var(--text-2);
+  text-decoration: none;
+}
+
+.breadcrumb-item a:hover {
+  color: var(--brand);
+}
+
+/* Tarjeta de crédito moderna */
+.credit-card {
+  background: linear-gradient(135deg, #7C4828 0%, #5a3419 100%);
+  border-radius: 16px;
+  padding: 24px;
+  height: 240px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+}
+
+.credit-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+}
+
+/* Variantes de color por tipo de tarjeta */
+.credit-card.visa {
+  background: linear-gradient(135deg, #004A9E 0%, #003875 100%);
+}
+
+.credit-card.mastercard {
+  background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
+}
+
+.credit-card.amex {
+  background: linear-gradient(135deg, #4F8C18 0%, #3d6e12 100%);
+}
+
+.credit-card.discover {
+  background: linear-gradient(135deg, #A9A9A9 0%, #8a8a8a 100%);
+}
+
+.credit-card.default {
+  background: linear-gradient(135deg, #7C4828 0%, #5a3419 100%);
+}
+
+/* Marca de agua del logo */
+.card-watermark {
+  position: absolute;
+  bottom: -30px;
+  right: -30px;
+  opacity: 0.1;
+  font-size: 180px;
+  font-weight: 900;
+  color: white;
+  pointer-events: none;
+  font-family: Arial, sans-serif;
+  line-height: 1;
+}
+
+/* Logo pequeño superior */
+.card-logo-small {
+  height: 35px;
+  object-fit: contain;
+  background: var(--surface);
+  padding: 5px;
+  border-radius: 5px;
+}
+
+/* Número de tarjeta */
+.card-number {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: white;
+  letter-spacing: 2px;
+  font-family: 'Courier New', monospace;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Información de la tarjeta */
+.card-info {
+  position: relative;
+  z-index: 2;
+}
+
+.card-holder,
+.card-expiry {
+  font-size: 0.65rem;
+  color: rgba(255, 255, 255, 0.8);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.card-holder-name,
+.card-expiry-date {
+  font-size: 0.85rem;
+  color: white;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+/* Badge predeterminada */
+.badge-default {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background-color: rgba(255, 255, 255, 0.25);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  z-index: 3;
+}
+
+/* Botones de acción dentro de la tarjeta */
+.card-actions {
+  display: flex;
+  gap: 8px;
+  position: relative;
+  z-index: 2;
+  margin-top: auto;
+}
+
+.btn-card-action {
+  flex: 1;
+  background-color: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.btn-card-action:hover:not(:disabled) {
+  background-color: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.5);
+  color: white;
+  transform: translateY(-2px);
+}
+
+.btn-card-action:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-card-action i {
+  font-size: 1rem;
+}
+
+/* Sin tarjetas */
+.empty-state {
+  background: var(--surface);
+  border-radius: 16px;
+  padding: 60px 40px;
+  text-align: center;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.empty-state i {
+  font-size: 5rem;
+  color: #dee2e6;
+  margin-bottom: 20px;
+}
+
+/* Botón añadir tarjeta */
+.btn-add-card {
+  background: linear-gradient(135deg, var(--brand) 0%, var(--brand-strong) 100%);
+  border: none;
+  padding: 12px 32px;
+  border-radius: 10px;
+  font-weight: 600;
+  color: white;
+  box-shadow: 0 4px 15px rgba(68, 117, 81, 0.4);
+  transition: all 0.3s ease;
+}
+
+.btn-add-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(68, 117, 81, 0.5);
+  color: white;
+}
+
+/* Alertas */
+.alert {
+  border: none;
+  border-radius: 12px;
+  padding: 16px 20px;
+}
+
+.alert-info {
+  background-color: var(--info-soft);
+  color: #014c8c;
+}
+
+/* Modal personalizado */
+.modal-header {
+  background: linear-gradient(135deg, var(--brand) 0%, var(--brand-strong) 100%) !important;
+  color: white;
+  border-bottom: none;
+  border-radius: 8px 8px 0 0;
+}
+
+.modal-header .btn-close {
+  filter: brightness(0) invert(1);
+}
+
+.modal-header .modal-title {
+  color: white !important;
+}
+
+.modal-title i {
+  margin-right: 8px;
+}
+
+.form-label {
+  font-weight: 600;
+  color: var(--text-2);
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+}
+
+.form-control,
+.form-select {
+  border-radius: 8px;
+  border: 1.5px solid var(--border);
+  padding: 10px 14px;
+  transition: all 0.3s ease;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 0.2rem rgba(68, 117, 81, 0.15);
+}
+
+.input-group-text {
+  background-color: var(--surface-2);
+  border: 1.5px solid var(--border);
+  border-left: none;
+  border-radius: 0 8px 8px 0;
+}
+
+/* Botones del modal */
+.modal-footer .btn-secondary {
+  background-color: #6c757d;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 24px;
+  font-weight: 500;
+}
+
+.modal-footer .btn-primary {
+  background: linear-gradient(135deg, var(--brand) 0%, var(--brand-strong) 100%);
+  border: none;
+  border-radius: 8px;
+  padding: 10px 24px;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(68, 117, 81, 0.3);
+  transition: all 0.3s ease;
+}
+
+.modal-footer .btn-primary:hover {
+  background: linear-gradient(135deg, var(--brand-strong) 0%, var(--brand) 100%);
+  box-shadow: 0 4px 12px rgba(68, 117, 81, 0.4);
+  transform: translateY(-1px);
+}
+
+/* Loading spinner */
+.spinner-border {
+  width: 3rem;
+  height: 3rem;
+}
+
+/* Espaciado para botones apilados */
+.d-flex.flex-column.gap-2 {
+  gap: 0.5rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .credit-card {
+    height: 280px;
+    padding: 20px;
+  }
+
+  .card-number {
+    font-size: 1.2rem;
+  }
+
+  .card-watermark {
+    font-size: 120px;
+  }
+}
+
+@media (max-width: 576px) {
+  .credit-card {
+    height: 300px;
+    padding: 16px;
+  }
+
+  .card-number {
+    font-size: 1.1rem;
+  }
+
+  .card-logo-small {
+    height: 28px;
+  }
+}

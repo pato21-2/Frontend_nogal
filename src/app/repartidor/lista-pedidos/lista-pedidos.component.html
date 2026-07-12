@@ -1,0 +1,162 @@
+<div class="lista-pedidos">
+  <!-- Filtros -->
+  <div class="filtros">
+    <div class="filtro-group">
+      <label>Filtrar por estado:</label>
+      <select [(ngModel)]="filtroEstado" class="form-select">
+        <option value="todos">Todos los pedidos</option>
+        <option value="ENVIADO">Listos para entregar</option>
+        <option value="ENTREGADO">Entregados</option>
+        <option value="CANCELADO">Cancelados</option>
+      </select>
+    </div>
+    <div class="contador">
+      <span class="badge badge-info">{{pedidosFiltrados.length}} pedidos</span>
+    </div>
+  </div>
+
+  <!-- Lista de Pedidos -->
+  <div class="pedidos-grid">
+    <div 
+      *ngFor="let pedido of pedidosFiltrados" 
+      class="pedido-item"
+      [class.selected]="pedidoSeleccionado?.id === pedido.id"
+      (click)="seleccionarPedido(pedido)">
+      
+      <!-- Header del pedido -->
+      <div class="pedido-header">
+        <div class="pedido-info">
+          <h4>Pedido #{{pedido.numeroPedido}}</h4>
+          <span class="badge" [ngClass]="getBadgeClass(pedido.estado)">
+            {{getEstadoTexto(pedido.estado)}}
+          </span>
+        </div>
+        <div class="pedido-fecha">
+          {{pedido.fechaPedido | date:'dd/MM/yyyy HH:mm'}}
+        </div>
+      </div>
+
+      <!-- Información rápida -->
+      <div class="pedido-preview">
+        <div class="preview-item">
+          <strong>Cliente:</strong> {{pedido.usuario.nombres}} {{pedido.usuario.apellidos}}
+        </div>
+        <div class="preview-item">
+          <strong>Productos:</strong> {{pedido.detalles.length}} items
+        </div>
+        <div class="preview-item">
+          <strong>Total:</strong> S/ {{pedido.total}}
+        </div>
+      </div>
+
+      <!-- Detalles expandidos -->
+      <div *ngIf="pedidoSeleccionado?.id === pedido.id" class="pedido-detalles">
+        
+        <!-- Información del cliente -->
+        <div class="detalle-section">
+          <h5>👤 Información del Cliente</h5>
+          <div class="detalle-grid">
+            <div class="detalle-item">
+              <strong>Nombre:</strong> {{pedido.usuario.nombres}} {{pedido.usuario.apellidos}}
+            </div>
+            <div class="detalle-item">
+              <strong>Email:</strong> {{pedido.usuario.email}}
+            </div>
+            <div class="detalle-item">
+              <strong>Teléfono:</strong> {{pedido.usuario.telefono}}
+            </div>
+            <div class="detalle-item">
+              <strong>Documento:</strong> {{pedido.usuario.tipoDocumento}} - {{pedido.usuario.numeroDocumento}}
+            </div>
+          </div>
+        </div>
+
+        <!-- Dirección de entrega -->
+        <div class="detalle-section">
+          <h5>🏠 Dirección de Entrega</h5>
+          <div class="direccion-card">
+            <p><strong>Dirección:</strong> {{pedido.direccion.direccion}}</p>
+            <p><strong>Número:</strong> {{pedido.direccion.numero}}</p>
+            <p *ngIf="pedido.direccion.departamento">
+              <strong>Departamento:</strong> {{pedido.direccion.departamento}}
+            </p>
+            <p *ngIf="pedido.direccion.provincia">
+              <strong>Provincia:</strong> {{pedido.direccion.provincia}}
+            </p>
+            <p *ngIf="pedido.direccion.distrito">
+              <strong>Distrito:</strong> {{pedido.direccion.distrito}}
+            </p>
+            <p><strong>Teléfono contacto:</strong> {{pedido.direccion.telefono}}</p>
+            <p><strong>Persona que recibe:</strong> {{pedido.direccion.nombreReceptor}} {{pedido.direccion.apellidosReceptor}}</p>
+          </div>
+        </div>
+
+        <!-- Productos del pedido -->
+        <div class="detalle-section">
+          <h5>📦 Productos</h5>
+          <div class="productos-list">
+            <div *ngFor="let detalle of pedido.detalles" class="producto-item">
+              <div class="producto-info">
+                <span class="producto-nombre">{{detalle.producto.nombre}}</span>
+                <span class="producto-cantidad">x{{detalle.cantidad}}</span>
+              </div>
+              <div class="producto-precio">
+                S/ {{detalle.precioUnitario}} c/u
+              </div>
+              <div class="producto-subtotal">
+                S/ {{detalle.subtotal}}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Resumen del pedido -->
+        <div class="detalle-section">
+          <h5>💰 Resumen del Pedido</h5>
+          <div class="resumen-pedido">
+            <div class="resumen-item">
+              <span>Subtotal:</span>
+              <span>S/ {{pedido.subtotal}}</span>
+            </div>
+            <div class="resumen-item">
+              <span>IGV (18%):</span>
+              <span>S/ {{pedido.igv}}</span>
+            </div>
+            <div class="resumen-item">
+              <span>Envío:</span>
+              <span>S/ {{pedido.envio}}</span>
+            </div>
+            <div class="resumen-item total">
+              <span><strong>Total:</strong></span>
+              <span><strong>S/ {{pedido.total}}</strong></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Acciones para pedidos ENVIADOS -->
+        <div *ngIf="pedido.estado === 'ENVIADO'" class="detalle-section acciones">
+          <h5>🚚 Registrar Entrega</h5>
+          <app-reporte-entrega 
+            [pedido]="pedido"
+            [repartidor]="repartidor"
+            (reporteCreado)="onReporteCreado()">
+          </app-reporte-entrega>
+        </div>
+
+        <!-- Información de entrega para pedidos ENTREGADOS -->
+        <div *ngIf="pedido.estado === 'ENTREGADO'" class="detalle-section entregado">
+          <h5>✅ Pedido Entregado</h5>
+          <p>Este pedido ya fue marcado como entregado.</p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Estado vacío -->
+  <div *ngIf="pedidosFiltrados.length === 0" class="empty-state">
+    <div class="empty-icon">📭</div>
+    <h3>No hay pedidos</h3>
+    <p>No se encontraron pedidos con los filtros seleccionados.</p>
+  </div>
+</div>

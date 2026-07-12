@@ -1,0 +1,232 @@
+<div class="container-fluid py-4">
+  <!-- Header -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center">
+        <h2 class="mb-0">
+          <i class="bi bi-credit-card me-2"></i>
+          Mis Tarjetas
+        </h2>
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a routerLink="/principal">Inicio</a></li>
+            <li class="breadcrumb-item"><a routerLink="/perfil">Mi Perfil</a></li>
+            <li class="breadcrumb-item active">Mis Tarjetas</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+
+  <!-- Aviso de verificación -->
+  <div *ngIf="mostrarAvisoVerificacion" class="row mb-4">
+    <div class="col-12">
+      <div class="alert alert-info alert-dismissible fade show">
+        <i class="bi bi-info-circle me-2"></i>
+        <strong>Verificación de tarjeta:</strong> Se cargará una pequeña cantidad a tu tarjeta para verificar su validez. 
+        Esta cantidad será reembolsada automáticamente en 24-48 horas.
+        <button type="button" class="btn-close" (click)="mostrarAvisoVerificacion = false"></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-12">
+      <!-- Sin tarjetas -->
+      <div *ngIf="!cargando && tarjetas.length === 0" class="empty-state">
+        <i class="bi bi-credit-card-2-front"></i>
+        <h4 class="mt-3">No tienes tarjetas guardadas</h4>
+        <p class="text-muted">Agrega una tarjeta para realizar compras de forma más rápida y segura.</p>
+        <button class="btn btn-add-card" (click)="abrirModalAgregar(modalAgregar)">
+          <i class="bi bi-plus-circle me-2"></i> Añadir nueva tarjeta
+        </button>
+      </div>
+
+      <!-- Con tarjetas -->
+      <div *ngIf="!cargando && tarjetas.length > 0">
+        <div class="row mb-4">
+          <div class="col-12">
+            <button class="btn btn-add-card" (click)="abrirModalAgregar(modalAgregar)">
+              <i class="bi bi-plus-circle me-2"></i> Añadir nueva tarjeta
+            </button>
+          </div>
+        </div>
+
+        <!-- Lista de tarjetas -->
+        <div class="row">
+          <div class="col-md-6 col-lg-4 mb-4" *ngFor="let tarjeta of tarjetas">
+            <div class="credit-card" [ngClass]="getCardClass(tarjeta.tipo)">
+              <!-- Badge predeterminada -->
+              <span class="badge-default" *ngIf="tarjeta.predeterminada">
+                <i class="bi bi-star-fill me-1"></i> Predeterminada
+              </span>
+
+              <!-- Logo de la tarjeta -->
+              <div class="d-flex justify-content-between align-items-start mb-3">
+                <img [src]="getLogo(tarjeta.tipo)" [alt]="tarjeta.tipo" class="card-logo-small">
+              </div>
+
+              <!-- Número de tarjeta -->
+              <div class="card-number mb-4">
+                {{ tarjeta.numeroEnmascarado }}
+              </div>
+
+              <!-- Información del titular y expiración -->
+              <div class="row card-info mb-3">
+                <div class="col-8">
+                  <div class="card-holder">TITULAR</div>
+                  <div class="card-holder-name">{{ tarjeta.nombreTitular }}</div>
+                </div>
+                <div class="col-4">
+                  <div class="card-expiry">EXPIRA</div>
+                  <div class="card-expiry-date">
+                    {{ tarjeta.mesExpiracion.toString().padStart(2, '0') }}/{{ tarjeta.anioExpiracion.toString().slice(-2) }}
+                  </div>
+                </div>
+              </div>
+
+              <!-- Botones de acción dentro de la tarjeta -->
+              <div class="card-actions">
+                <button class="btn-card-action" 
+                        (click)="abrirModalEditar(modalAgregar, tarjeta)">
+                  <i class="bi bi-pencil"></i> Editar
+                </button>
+                
+                <button class="btn-card-action" 
+                        (click)="establecerPredeterminada(tarjeta.id!)"
+                        [disabled]="tarjeta.predeterminada">
+                  <i class="bi bi-star-fill" *ngIf="tarjeta.predeterminada"></i>
+                  <i class="bi bi-star" *ngIf="!tarjeta.predeterminada"></i>
+                </button>
+                
+                <button class="btn-card-action" 
+                        (click)="eliminarTarjeta(tarjeta.id!)"
+                        [disabled]="tarjetas.length === 1 && tarjeta.predeterminada">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+
+              <!-- Marca de agua del tipo de tarjeta -->
+              <div class="card-watermark">{{ getLogoText(tarjeta.tipo) }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Loading -->
+      <div *ngIf="cargando" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Cargando...</span>
+        </div>
+        <p class="mt-3 text-muted">Cargando tarjetas...</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para agregar/editar tarjeta -->
+<ng-template #modalAgregar let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">
+      <i class="bi bi-credit-card me-2"></i>
+      {{ tarjetaEdicionId ? 'Editar Tarjeta' : 'Añadir Nueva Tarjeta' }}
+    </h5>
+    <button type="button" class="btn-close" (click)="modal.dismiss()"></button>
+  </div>
+  
+  <div class="modal-body">
+    <form (ngSubmit)="guardarTarjeta()">
+      <!-- Número de tarjeta -->
+      <div class="mb-3">
+        <label class="form-label">Número de tarjeta</label>
+        <div class="input-group">
+          <input type="text" 
+                 class="form-control" 
+                 [(ngModel)]="nuevaTarjeta.numeroCompleto"
+                 name="numeroCompleto"
+                 (input)="formatearNumeroTarjeta()"
+                 placeholder="1234 5678 9012 3456"
+                 maxlength="19"
+                 [readonly]="!!tarjetaEdicionId">
+          <span class="input-group-text" *ngIf="tipoTarjeta">
+            <img [src]="getLogo(tipoTarjeta)" [alt]="tipoTarjeta" style="height: 20px;">
+          </span>
+        </div>
+        <small class="form-text text-muted" *ngIf="tarjetaEdicionId">
+          El número de tarjeta no se puede modificar por seguridad.
+        </small>
+      </div>
+
+      <!-- Nombre del titular -->
+      <div class="mb-3">
+        <label class="form-label">Nombre en la tarjeta</label>
+        <input type="text" 
+               class="form-control" 
+               [(ngModel)]="nuevaTarjeta.nombreTitular"
+               name="nombreTitular"
+               placeholder="Nombre completo">
+      </div>
+
+      <!-- Fecha de expiración -->
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <label class="form-label">Mes de expiración</label>
+          <select class="form-select" 
+                  [(ngModel)]="nuevaTarjeta.mesExpiracion"
+                  name="mesExpiracion">
+            <option value="">Seleccione mes</option>
+            <option *ngFor="let mes of meses" [value]="mes">
+              {{ mes.toString().padStart(2, '0') }}
+            </option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Año de expiración</label>
+          <select class="form-select" 
+                  [(ngModel)]="nuevaTarjeta.anioExpiracion"
+                  name="anioExpiracion">
+            <option value="">Seleccione año</option>
+            <option *ngFor="let anio of anios" [value]="anio">
+              {{ anio }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <!-- CVV (solo para nuevas tarjetas) -->
+      <div class="mb-4" *ngIf="!tarjetaEdicionId">
+        <label class="form-label">CVV</label>
+        <input type="password" 
+               class="form-control" 
+               [(ngModel)]="nuevaTarjeta.cvv"
+               name="cvv"
+               placeholder="123"
+               maxlength="4">
+        <small class="form-text text-muted">
+          <i class="bi bi-shield-lock me-1"></i>
+          El CVV no se almacena por seguridad. Solo se utiliza para verificación.
+        </small>
+      </div>
+
+      <!-- Aviso de verificación (solo para nuevas tarjetas) -->
+      <div class="alert alert-warning" *ngIf="!tarjetaEdicionId">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        <strong>Verificación requerida:</strong> Se cargará una pequeña cantidad a tu tarjeta 
+        para verificar su validez. Esta cantidad será reembolsada en 24-48 horas.
+      </div>
+    </form>
+  </div>
+  
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">
+      Cancelar
+    </button>
+    <button type="button" 
+            class="btn btn-primary" 
+            (click)="guardarTarjeta()"
+            [disabled]="guardando">
+      <span *ngIf="guardando" class="spinner-border spinner-border-sm me-1"></span>
+      {{ tarjetaEdicionId ? 'Actualizar' : 'Añadir' }} Tarjeta
+    </button>
+  </div>
+</ng-template>

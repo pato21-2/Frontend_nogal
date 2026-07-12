@@ -1,0 +1,77 @@
+.product-card {
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  border: 1px solid var(--border);
+}
+
+.product-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.product-image {
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--surface-2);
+  border-radius: 4px;
+}
+
+.product-details {
+  font-size: 0.85rem;
+}
+
+.product-prices {
+  border-top: 1px solid var(--border);
+  padding-top: 8px;
+}
+
+/* Badge styles */
+.bg-success { background-color: #198754 !important; }
+.bg-warning { background-color: #ffc107 !important; color: #000 !important; }
+.bg-danger { background-color: var(--danger) !important; }
+.bg-info { background-color: #0dcaf0 !important; color: #000 !important; }
+
+/* Vista grid responsive */
+@media (max-width: 768px) {
+  .col-md-6 {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+}
+
+/* Loading animation */
+.spinner-border {
+  width: 2rem;
+  height: 2rem;
+}
+
+/* Table responsive */
+.table-responsive {
+  border-radius: 4px;
+}
+
+/* Button group styles */
+.btn-group-sm > .btn {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+}
+
+/* Modal scroll */
+.modal-body {
+  scrollbar-width: thin;
+  scrollbar-color: #adb5bd #f8f9fa;
+}
+
+.modal-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+  background: var(--surface-2);
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+  background-color: #adb5bd;
+  border-radius: 3px;
+}

@@ -1,0 +1,115 @@
+.quantity-controls .btn {
+  width: 35px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+}
+
+.product-image img {
+  transition: transform 0.2s ease;
+  border-radius: 6px;
+}
+
+.product-image img:hover {
+  transform: scale(1.05);
+}
+
+.resumen-item {
+  font-size: 0.95rem;
+  padding: 5px 0;
+}
+
+.resumen-total {
+  border-top: 2px solid var(--border);
+  padding-top: 10px;
+}
+
+.stock-info {
+  font-size: 0.8rem;
+}
+
+.table th {
+  border-top: none;
+  font-weight: 600;
+  background-color: var(--brand);
+  color: white;
+}
+
+.card {
+  border: none;
+  box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+  border-radius: 10px;
+}
+
+.card-header {
+  border-bottom: 1px solid var(--border);
+  border-radius: 10px 10px 0 0 !important;
+}
+
+.alert {
+  border: none;
+  border-radius: 6px;
+  font-size: 0.85rem;
+}
+
+.table-warning {
+  background-color: var(--warning-soft) !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .quantity-controls {
+    flex-direction: column;
+    gap: 5px;
+  }
+  
+  .table-responsive {
+    font-size: 0.9rem;
+  }
+  
+  .product-image {
+    min-width: 50px;
+  }
+  
+  .card-body {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .container-fluid {
+    padding: 0 10px;
+  }
+  
+  .table-responsive {
+    font-size: 0.8rem;
+  }
+  
+  .btn-lg {
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+  }
+}
+
+/* Badge styles */
+.badge {
+  font-size: 0.7rem;
+}
+
+/* Loading states */
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Hover effects */
+.btn:hover {
+  transform: translateY(-1px);
+  transition: all 0.2s ease;
+}
+
+.table-hover tbody tr:hover {
+  background-color: rgba(44, 85, 48, 0.05);
+}

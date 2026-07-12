@@ -1,0 +1,277 @@
+<div class="cot-page">
+  <header class="cot-header veta-top no-imprimir">
+    <div class="d-flex align-items-center gap-3">
+      <button class="btn btn-outline-primary btn-sm" routerLink="/panel-admin" aria-label="Volver al panel">
+        <i class="bi bi-arrow-left" aria-hidden="true"></i>
+      </button>
+      <div>
+        <h1 class="cot-titulo"><i class="bi bi-file-earmark-text me-2" aria-hidden="true"></i>Cotizaciones</h1>
+        <p class="cot-subtitulo">Crea, envía, versiona y convierte cotizaciones en pedidos</p>
+      </div>
+    </div>
+    <button class="btn btn-primary" (click)="abrirFormulario()">
+      <i class="bi bi-plus-lg me-1" aria-hidden="true"></i> Nueva cotización
+    </button>
+  </header>
+
+  <div *ngIf="exito" class="alert alert-success no-imprimir" role="status">
+    <i class="bi bi-check-circle-fill me-1" aria-hidden="true"></i> {{ exito }}
+  </div>
+  <div *ngIf="error" class="alert alert-danger no-imprimir" role="alert">
+    <i class="bi bi-exclamation-triangle-fill me-1" aria-hidden="true"></i> {{ error }}
+  </div>
+
+  <!-- ===== Formulario de creación ===== -->
+  <div class="card mb-4 no-imprimir anim-fade-up" *ngIf="mostrandoFormulario">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <span>Nueva cotización</span>
+      <button class="btn btn-sm btn-outline-secondary" (click)="mostrandoFormulario = false">Cancelar</button>
+    </div>
+    <div class="card-body">
+      <div class="row g-3 mb-3">
+        <div class="col-md-5">
+          <label class="form-label" for="cotCliente">Cliente *</label>
+          <select id="cotCliente" class="form-select" [(ngModel)]="nueva.clienteId">
+            <option [ngValue]="null">Selecciona un cliente…</option>
+            <option *ngFor="let c of clientes" [ngValue]="c.id">{{ c.nombres }} {{ c.apellidos }} — {{ c.numeroDocumento }}</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label" for="cotVigencia">Vigente hasta</label>
+          <input id="cotVigencia" type="date" class="form-control" [(ngModel)]="nueva.vigenciaHasta">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label" for="cotDescuento">Descuento global (S/)</label>
+          <input id="cotDescuento" type="number" min="0" step="0.01" class="form-control" [(ngModel)]="nueva.descuento">
+        </div>
+      </div>
+
+      <h6 class="mb-2">Productos</h6>
+      <div class="table-responsive">
+        <table class="table align-middle">
+          <thead>
+            <tr><th style="min-width:220px">Producto</th><th>Cantidad</th><th>Precio unit.</th><th>Desc. %</th><th>Subtotal</th><th></th></tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let l of lineas; let i = index">
+              <td>
+                <select class="form-select" [(ngModel)]="l.productoId" (change)="alSeleccionarProducto(l)"
+                        [attr.aria-label]="'Producto de la línea ' + (i + 1)">
+                  <option [ngValue]="null">Selecciona…</option>
+                  <option *ngFor="let p of productos" [ngValue]="p.id">{{ p.nombre }} (stock {{ p.stock }})</option>
+                </select>
+              </td>
+              <td><input type="number" min="1" class="form-control" style="width:90px" [(ngModel)]="l.cantidad"
+                         [attr.aria-label]="'Cantidad línea ' + (i + 1)"></td>
+              <td><input type="number" min="0" step="0.01" class="form-control" style="width:120px" [(ngModel)]="l.precioUnitario"
+                         [attr.aria-label]="'Precio línea ' + (i + 1)"></td>
+              <td><input type="number" min="0" max="100" class="form-control" style="width:90px" [(ngModel)]="l.descuentoPct"
+                         [attr.aria-label]="'Descuento línea ' + (i + 1)"></td>
+              <td class="fw-bold">S/ {{ (l.cantidad || 0) * (l.precioUnitario || 0) * (1 - (l.descuentoPct || 0) / 100) | number:'1.2-2' }}</td>
+              <td>
+                <button class="btn btn-sm btn-outline-danger" (click)="quitarLinea(i)" [disabled]="lineas.length === 1"
+                        [attr.aria-label]="'Quitar línea ' + (i + 1)">
+                  <i class="bi bi-trash" aria-hidden="true"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <button class="btn btn-outline-primary btn-sm" (click)="agregarLinea()">
+        <i class="bi bi-plus-lg me-1" aria-hidden="true"></i> Agregar producto
+      </button>
+
+      <div class="row g-3 mt-2">
+        <div class="col-md-8">
+          <label class="form-label" for="cotObs">Observaciones</label>
+          <textarea id="cotObs" class="form-control" rows="2" [(ngModel)]="nueva.observaciones"
+                    placeholder="Condiciones de entrega, garantía, forma de pago…"></textarea>
+        </div>
+        <div class="col-md-4">
+          <div class="cot-totales">
+            <div><span>Subtotal</span><strong>S/ {{ subtotalFormulario | number:'1.2-2' }}</strong></div>
+            <div><span>Descuento</span><strong>− S/ {{ nueva.descuento || 0 | number:'1.2-2' }}</strong></div>
+            <div><span>IGV (18%)</span><strong>S/ {{ igvFormulario | number:'1.2-2' }}</strong></div>
+            <div class="cot-total-final"><span>Total</span><strong>S/ {{ totalFormulario | number:'1.2-2' }}</strong></div>
+          </div>
+          <button class="btn btn-primary w-100 mt-2" (click)="guardar()" [disabled]="guardando">
+            <span *ngIf="guardando" class="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
+            {{ guardando ? 'Guardando…' : 'Guardar cotización' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Listado ===== -->
+  <div class="card no-imprimir">
+    <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+      <span>Documentos ({{ cotizacionesFiltradas.length }})</span>
+      <select class="form-select form-select-sm" style="width:200px" [(ngModel)]="filtroEstado" aria-label="Filtrar por estado">
+        <option value="">Todos los estados</option>
+        <option value="BORRADOR">Borrador</option>
+        <option value="ENVIADA">Enviada</option>
+        <option value="ACEPTADA">Aceptada</option>
+        <option value="RECHAZADA">Rechazada</option>
+        <option value="VENCIDA">Vencida</option>
+        <option value="CONVERTIDA">Convertida</option>
+      </select>
+    </div>
+    <div class="card-body table-responsive">
+      <div *ngIf="cargando" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status"><span class="visually-hidden">Cargando…</span></div>
+      </div>
+      <table class="table table-hover align-middle" *ngIf="!cargando">
+        <thead>
+          <tr><th>Número</th><th>Cliente</th><th>Emisión</th><th>Vigencia</th><th>Total</th><th>Estado</th><th>Acciones</th></tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let c of cotizacionesFiltradas">
+            <td class="fw-bold">{{ c.numero }} <small class="text-muted" *ngIf="(c.version || 1) > 1">v{{ c.version }}</small></td>
+            <td>{{ nombreCliente(c) }}</td>
+            <td>{{ c.fechaEmision | date:'dd/MM/yyyy' }}</td>
+            <td>{{ c.vigenciaHasta | date:'dd/MM/yyyy' }}</td>
+            <td>S/ {{ c.total | number:'1.2-2' }}</td>
+            <td><span class="badge" [ngClass]="claseEstado(c.estado)">{{ c.estado }}</span></td>
+            <td class="cot-acciones">
+              <button class="btn btn-sm btn-outline-primary" (click)="verDetalle(c)" title="Ver / imprimir">
+                <i class="bi bi-eye" aria-hidden="true"></i>
+              </button>
+              <button *ngIf="c.estado === 'BORRADOR'" class="btn btn-sm btn-outline-info" (click)="cambiarEstado(c, 'ENVIADA')" title="Marcar enviada">
+                <i class="bi bi-send" aria-hidden="true"></i>
+              </button>
+              <button *ngIf="c.estado === 'ENVIADA'" class="btn btn-sm btn-outline-success" (click)="cambiarEstado(c, 'ACEPTADA')" title="Aceptar (firma)">
+                <i class="bi bi-check-lg" aria-hidden="true"></i>
+              </button>
+              <button *ngIf="c.estado === 'ENVIADA'" class="btn btn-sm btn-outline-danger" (click)="cambiarEstado(c, 'RECHAZADA')" title="Rechazar">
+                <i class="bi bi-x-lg" aria-hidden="true"></i>
+              </button>
+              <button *ngIf="c.estado === 'ACEPTADA'" class="btn btn-sm btn-primary" (click)="abrirConversion(c)" title="Convertir en pedido">
+                <i class="bi bi-cart-check" aria-hidden="true"></i>
+              </button>
+              <button *ngIf="c.estado === 'ENVIADA' || c.estado === 'VENCIDA' || c.estado === 'RECHAZADA'"
+                      class="btn btn-sm btn-outline-secondary" (click)="nuevaVersion(c)" title="Nueva versión">
+                <i class="bi bi-files" aria-hidden="true"></i>
+              </button>
+              <button *ngIf="c.estado === 'BORRADOR'" class="btn btn-sm btn-outline-danger" (click)="eliminar(c)" title="Eliminar borrador">
+                <i class="bi bi-trash" aria-hidden="true"></i>
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="cotizacionesFiltradas.length === 0">
+            <td colspan="7" class="text-center text-muted py-4">Sin cotizaciones registradas</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ===== Detalle / documento imprimible ===== -->
+  <div class="cot-overlay no-imprimir-fondo" *ngIf="seleccionada" (click)="seleccionada = null">
+    <div class="cot-documento" (click)="$event.stopPropagation()" role="dialog" aria-modal="true"
+         [attr.aria-label]="'Cotización ' + seleccionada.numero">
+      <div class="doc-acciones no-imprimir">
+        <button class="btn btn-primary btn-sm" (click)="imprimir()">
+          <i class="bi bi-printer me-1" aria-hidden="true"></i> Imprimir / PDF
+        </button>
+        <button class="btn btn-outline-secondary btn-sm" (click)="seleccionada = null">Cerrar</button>
+      </div>
+
+      <header class="doc-cabecera">
+        <div>
+          <h2>Comercial El Nogal</h2>
+          <p>Carabayllo, Lima · RUC 10747436687<br>(01) 456-7890</p>
+        </div>
+        <div class="doc-numero">
+          <h3>COTIZACIÓN</h3>
+          <p class="doc-num">{{ seleccionada.numero }} <span *ngIf="(seleccionada.version || 1) > 1">· versión {{ seleccionada.version }}</span></p>
+          <span class="badge" [ngClass]="claseEstado(seleccionada.estado)">{{ seleccionada.estado }}</span>
+        </div>
+      </header>
+
+      <section class="doc-datos">
+        <div><strong>Cliente:</strong> {{ nombreCliente(seleccionada) }}</div>
+        <div><strong>Emisión:</strong> {{ seleccionada.fechaEmision | date:'dd/MM/yyyy' }}</div>
+        <div><strong>Vigente hasta:</strong> {{ seleccionada.vigenciaHasta | date:'dd/MM/yyyy' }}</div>
+        <div *ngIf="seleccionada.firmadoPor"><strong>Aceptada por:</strong> {{ seleccionada.firmadoPor }}</div>
+      </section>
+
+      <table class="table doc-tabla">
+        <thead>
+          <tr><th>Producto</th><th>Cant.</th><th>P. unit.</th><th>Desc.</th><th class="text-end">Subtotal</th></tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let d of seleccionada.detalles">
+            <td>{{ d.producto.nombre }}</td>
+            <td>{{ d.cantidad }}</td>
+            <td>S/ {{ d.precioUnitario | number:'1.2-2' }}</td>
+            <td>{{ d.descuentoPct || 0 }}%</td>
+            <td class="text-end">S/ {{ d.subtotal | number:'1.2-2' }}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="doc-resumen">
+        <div><span>Subtotal</span><span>S/ {{ seleccionada.subtotal | number:'1.2-2' }}</span></div>
+        <div *ngIf="(seleccionada.descuento || 0) > 0"><span>Descuento</span><span>− S/ {{ seleccionada.descuento | number:'1.2-2' }}</span></div>
+        <div><span>IGV (18%)</span><span>S/ {{ seleccionada.igv | number:'1.2-2' }}</span></div>
+        <div class="doc-total"><span>TOTAL</span><span>S/ {{ seleccionada.total | number:'1.2-2' }}</span></div>
+      </div>
+
+      <p class="doc-observaciones" *ngIf="seleccionada.observaciones">
+        <strong>Observaciones:</strong> {{ seleccionada.observaciones }}
+      </p>
+
+      <footer class="doc-firma" *ngIf="seleccionada.firmadoPor">
+        <div class="linea-firma">
+          <span>{{ seleccionada.firmadoPor }}</span>
+          <small>Aceptado digitalmente · {{ seleccionada.fechaEmision | date:'dd/MM/yyyy' }}</small>
+        </div>
+      </footer>
+    </div>
+  </div>
+
+  <!-- ===== Modal de conversión a pedido ===== -->
+  <div class="cot-overlay no-imprimir" *ngIf="convirtiendo" (click)="convirtiendo = null">
+    <div class="cot-modal" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" aria-label="Convertir cotización en pedido">
+      <h5 class="mb-1"><i class="bi bi-cart-check me-1 text-primary" aria-hidden="true"></i> Convertir {{ convirtiendo.numero }} en pedido</h5>
+      <p class="text-muted small mb-3">Se creará un pedido real por S/ {{ convirtiendo.total | number:'1.2-2' }} y se descontará el stock.</p>
+
+      <label class="form-label" for="convDireccion">Dirección de entrega del cliente *</label>
+      <select id="convDireccion" class="form-select mb-2" [(ngModel)]="conversion.direccionId">
+        <option [ngValue]="null">Selecciona…</option>
+        <option *ngFor="let d of direccionesCliente" [ngValue]="d.id">{{ d.nombreDireccion }} — {{ d.direccion }}, {{ d.distrito }}</option>
+      </select>
+      <p class="text-danger small" *ngIf="direccionesCliente.length === 0">
+        <i class="bi bi-exclamation-triangle me-1" aria-hidden="true"></i>
+        El cliente no tiene direcciones registradas: debe agregar una desde su perfil.
+      </p>
+
+      <label class="form-label" for="convTarjeta">Tarjeta del cliente *</label>
+      <select id="convTarjeta" class="form-select mb-2" [(ngModel)]="conversion.tarjetaId">
+        <option [ngValue]="null">Selecciona…</option>
+        <option *ngFor="let t of tarjetasCliente" [ngValue]="t.id">{{ t.tipo }} {{ t.numeroEnmascarado }}</option>
+      </select>
+      <p class="text-danger small" *ngIf="tarjetasCliente.length === 0">
+        <i class="bi bi-exclamation-triangle me-1" aria-hidden="true"></i>
+        El cliente no tiene tarjetas registradas: debe agregar una desde su perfil.
+      </p>
+
+      <label class="form-label" for="convMetodo">Método de pago</label>
+      <select id="convMetodo" class="form-select mb-3" [(ngModel)]="conversion.metodoPago">
+        <option value="TARJETA">Tarjeta</option>
+        <option value="YAPE">Yape</option>
+        <option value="PLIN">Plin</option>
+        <option value="CONTRAENTREGA">Contraentrega</option>
+      </select>
+
+      <div class="d-flex gap-2 justify-content-end">
+        <button class="btn btn-outline-secondary" (click)="convirtiendo = null">Cancelar</button>
+        <button class="btn btn-primary" (click)="confirmarConversion()">
+          <i class="bi bi-check-lg me-1" aria-hidden="true"></i> Crear pedido
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

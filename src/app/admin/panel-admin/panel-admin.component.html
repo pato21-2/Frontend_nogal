@@ -1,0 +1,488 @@
+<div class="admin-panel">
+  <!-- Sidebar -->
+  <div class="sidebar position-fixed h-100" [class.collapsed]="sidebarColapsada" [class.show]="!sidebarColapsada">
+    <div class="sidebar-brand">
+      <div class="d-flex align-items-center">
+        <i class="bi bi-house-gear-fill text-warning fs-4"></i>
+        <span class="brand-text ms-2">Nogal Admin</span>
+      </div>
+    </div>
+    
+    <nav class="sidebar-nav mt-3">
+      <ul class="nav flex-column">
+        <li class="nav-item">
+          <a class="nav-link active" href="javascript:void(0)">
+            <i class="bi bi-speedometer2"></i>
+            <span class="nav-text">{{ 'Dashboard' | t }}</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="javascript:void(0)" (click)="abrirFormularioUsuario()">
+            <i class="bi bi-person-plus"></i>
+            <span class="nav-text">{{ 'Crear Usuario' | t }}</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="javascript:void(0)" (click)="navegarA('/bi')">
+            <i class="bi bi-graph-up-arrow"></i>
+            <span class="nav-text">{{ 'Centro BI' | t }}</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="javascript:void(0)" (click)="navegarA('/cotizaciones')">
+            <i class="bi bi-file-earmark-text"></i>
+            <span class="nav-text">{{ 'Cotizaciones' | t }}</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="javascript:void(0)" (click)="navegarA('/crm')">
+            <i class="bi bi-people-fill"></i>
+            <span class="nav-text">CRM</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="javascript:void(0)" (click)="navegarA('/asistente')">
+            <i class="bi bi-stars"></i>
+            <span class="nav-text">{{ 'Asistente' | t }}</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="javascript:void(0)" (click)="navegarA('/gestion-usuarios')">
+            <i class="bi bi-people"></i>
+            <span class="nav-text">{{ 'Gestión Usuarios' | t }}</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="javascript:void(0)" (click)="navegarA('/panel-logistico')">
+            <i class="bi bi-box-seam"></i>
+            <span class="nav-text">{{ 'Módulo Logístico' | t }}</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="javascript:void(0)" (click)="navegarA('/reportes')">
+            <i class="bi bi-graph-up"></i>
+            <span class="nav-text">{{ 'Reportes' | t }}</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="javascript:void(0)" (click)="navegarA('/productos-no-movimiento')">
+            <i class="bi bi-graph-up"></i>
+            <span class="nav-text">{{ 'Productos Bajos' | t }}</span>
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" href="javascript:void(0)" (click)="navegarAClientesTop()">
+            <i class="bi bi-trophy"></i>
+            <span class="nav-text">{{ 'Top Clientes' | t }}</span>
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" href="javascript:void(0)" (click)="navegarA('/configuracion')">
+            <i class="bi bi-gear"></i>
+            <span class="nav-text">{{ 'Configuración' | t }}</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+
+  <!-- Main Content -->
+  <div class="admin-main" [style.margin-left]="sidebarColapsada ? '70px' : '280px'">
+    <!-- Header -->
+    <header class="admin-header sticky-top p-3">
+      <div class="container-fluid">
+        <div class="d-flex justify-content-between align-items-center">
+          <div class="d-flex align-items-center">
+            <button class="btn btn-outline-admin me-3" (click)="toggleSidebar()">
+              <i class="bi bi-list"></i>
+            </button>
+            <h4 class="mb-0 text-gold">{{ 'Panel de Administración' | t }}</h4>
+          </div>
+          
+          <div class="user-info">
+            <div class="user-avatar">
+              {{ usuarioActual?.nombres?.charAt(0) }}{{ usuarioActual?.apellidos?.charAt(0) }}
+            </div>
+            <div class="user-details">
+              <div class="user-name">{{ usuarioActual?.nombres }} {{ usuarioActual?.apellidos }}</div>
+              <div class="user-role text-muted">{{ usuarioActual?.rol }}</div>
+            </div>
+            <button class="btn btn-outline-admin ms-3" (click)="cerrarSesion()">
+              <i class="bi bi-box-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Content -->
+    <main class="container-fluid py-4">
+      <!-- Métricas Principales -->
+      <div class="row mb-4 animate-fade-in-up">
+        <div class="col-xl-3 col-md-6 mb-4">
+          <div class="metric-card">
+            <div class="metric-icon users">
+              <i class="bi bi-people-fill text-white"></i>
+            </div>
+            <div class="metric-value">{{ formatearNumero(estadisticas.totalUsuarios) }}</div>
+            <div class="metric-label">{{ 'Total Usuarios' | t }}</div>
+            <div class="metric-change text-success">
+              <i class="bi bi-arrow-up"></i>
+              <span>12% este mes</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6 mb-4">
+          <div class="metric-card">
+            <div class="metric-icon orders">
+              <i class="bi bi-cart-check text-white"></i>
+            </div>
+            <div class="metric-value">{{ formatearNumero(estadisticas.totalPedidos) }}</div>
+            <div class="metric-label">{{ 'Pedidos Totales' | t }}</div>
+            <div class="metric-change text-success">
+              <i class="bi bi-arrow-up"></i>
+              <span>8% este mes</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6 mb-4">
+          <div class="metric-card">
+            <div class="metric-icon products">
+              <i class="bi bi-box-seam text-white"></i>
+            </div>
+            <div class="metric-value">{{ formatearNumero(estadisticas.totalProductos) }}</div>
+            <div class="metric-label">{{ 'Productos Activos' | t }}</div>
+            <div class="metric-change text-danger">
+              <i class="bi bi-arrow-down"></i>
+              <span>3% este mes</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6 mb-4">
+          <div class="metric-card">
+            <div class="metric-icon revenue">
+              <i class="bi bi-currency-dollar text-white"></i>
+            </div>
+            <div class="metric-value">{{ formatearMoneda(estadisticas.ingresosMensuales) }}</div>
+            <div class="metric-label">{{ 'Ingresos Mensuales' | t }}</div>
+            <div class="metric-change text-success">
+              <i class="bi bi-arrow-up"></i>
+              <span>15% este mes</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Segunda fila de métricas -->
+      <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+          <div class="metric-card">
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                <div class="metric-value text-warning">{{ formatearNumero(estadisticas.pedidosPendientes) }}</div>
+                <div class="metric-label">{{ 'Pedidos Pendientes' | t }}</div>
+              </div>
+              <i class="bi bi-clock-history fs-2 text-warning"></i>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6 mb-4">
+          <div class="metric-card">
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                <div class="metric-value text-info">{{ formatearNumero(estadisticas.clientesNuevos) }}</div>
+                <div class="metric-label">{{ 'Clientes Nuevos' | t }}</div>
+              </div>
+              <i class="bi bi-person-plus fs-2 text-info"></i>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6 mb-4">
+          <div class="metric-card">
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                <div class="metric-value text-success">{{ formatearNumero(estadisticas.totalProveedores) }}</div>
+                <div class="metric-label">{{ 'Proveedores Activos' | t }}</div>
+              </div>
+              <i class="bi bi-truck fs-2 text-success"></i>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6 mb-4">
+          <div class="metric-card">
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                <div class="metric-value text-danger">{{ formatearNumero(estadisticas.productosStockBajo) }}</div>
+                <div class="metric-label">{{ 'Stock Bajo' | t }}</div>
+              </div>
+              <i class="bi bi-exclamation-triangle fs-2 text-danger"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gráficos y Tablas -->
+      <div class="row">
+                <!-- Gráfico de tendencias REAL -->
+        <div class="col-xl-8 mb-4">
+          <div class="chart-container">
+            <div class="chart-header">
+              <h5 class="chart-title">{{ 'Tendencia de Ventas - Últimos 7 Días' | t }}</h5>
+              <div class="d-flex gap-2">
+                <button class="btn btn-sm btn-outline-admin" (click)="recargarDatos()" [disabled]="cargando">
+                  <i class="bi" [class.bi-arrow-clockwise]="!cargando" [class.bi-arrow-repeat]="cargando"></i>
+                </button>
+              </div>
+            </div>
+            
+            <!-- Gráfico ECharts -->
+            <div *ngIf="isChartReady" style="height: 300px; position: relative;">
+              <div echarts 
+                  [options]="tendenciaChartOption" 
+                  (chartInit)="onChartInit($event)"
+                  [autoResize]="true"
+                  [loading]="cargando"
+                  class="echarts-tendencia">
+              </div>
+              
+              <!-- Indicador de datos simulados (solo si no hay datos reales) -->
+              <div *ngIf="tendenciaVentas.length < 7" class="chart-info-badge">
+                <span class="badge bg-warning text-dark">
+                  <i class="bi bi-info-circle me-1"></i>
+                  Datos estimados
+                </span>
+              </div>
+            </div>
+
+            <!-- Mensaje cuando no hay datos -->
+            <div *ngIf="!isChartReady && !cargando" class="text-center text-muted py-4">
+              <i class="bi bi-bar-chart fs-1 d-block mb-2"></i>
+              Cargando gráfico de ventas...
+            </div>
+            <br>
+            <br>  
+            <br>
+            <br>  
+            <br>
+            <br>  
+            <!-- Resumen de ventas -->
+            <div class="mt-3 row text-center" *ngIf="isChartReady">
+              <div class="col-4">
+                <div class="text-success fw-bold">{{ formatearMoneda(estadisticas.totalVentas30Dias) }}</div>
+                <div class="text-muted small">{{ 'Total 30 días' | t }}</div>
+              </div>
+              <div class="col-4">
+                <div class="text-info fw-bold">{{ formatearMoneda(estadisticas.promedioDiario) }}</div>
+                <div class="text-muted small">{{ 'Promedio diario' | t }}</div>
+              </div>
+              <div class="col-4">
+                <div class="text-warning fw-bold">{{ estadisticas.totalPedidos30Dias }}</div>
+                <div class="text-muted small">{{ 'Pedidos 30 días' | t }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Productos más vendidos -->
+        <div class="col-xl-4 mb-4">
+          <div class="chart-container">
+            <div class="chart-header">
+              <h5 class="chart-title">{{ 'Productos Más Vendidos' | t }}</h5>
+            </div>
+            <div class="productos-list">
+              <div *ngFor="let producto of productosMasVendidos; let i = index" 
+                   class="d-flex justify-content-between align-items-center py-2 border-bottom border-secondary">
+                <div class="d-flex align-items-center">
+                  <span class="badge bg-primary me-2">{{ i + 1 }}</span>
+                  <span>{{ producto.nombre }}</span>
+                </div>
+                <span class="text-success">{{ producto.cantidadTotal || producto.ventas }} ventas</span>
+              </div>
+              <div *ngIf="productosMasVendidos.length === 0" class="text-center text-muted py-3">
+                <i class="bi bi-inbox fs-4 d-block mb-2"></i>
+                No hay datos de productos vendidos
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Últimos Pedidos -->
+      <div class="row">
+        <div class="col-12">
+          <div class="chart-container">
+            <div class="chart-header">
+              <h5 class="chart-title">{{ 'Últimos Pedidos' | t }}</h5>
+              <button class="btn btn-primary-admin" (click)="navegarA('/gestion-pedidos')">
+                <i class="bi bi-eye"></i> Ver Todos
+              </button>
+            </div>
+            <div class="table-responsive">
+              <table class="table table-hover pedidos-table">
+                <thead>
+                  <tr>
+                    <th>{{ 'N° Pedido' | t }}</th>
+                    <th>{{ 'Cliente' | t }}</th>
+                    <th>{{ 'Fecha' | t }}</th>
+                    <th>{{ 'Total' | t }}</th>
+                    <th>{{ 'Estado' | t }}</th>
+                    <th>{{ 'Acciones' | t }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let pedido of ultimosPedidos" class="animate-fade-in-up">
+                    <td>
+                      <strong>{{ pedido.numeroPedido }}</strong>
+                    </td>
+                    <td>
+                      {{ pedido.usuario?.nombres }} {{ pedido.usuario?.apellidos }}
+                    </td>
+                    <td>{{ formatearFecha(pedido.fechaPedido) }}</td>
+                    <td>
+                      <strong class="text-success">{{ formatearMoneda(pedido.total) }}</strong>
+                    </td>
+                    <td>
+                      <span [class]="'badge badge-' + pedido.estado?.toLowerCase()">
+                        {{ pedido.estado }}
+                      </span>
+                    </td>
+                    <td>
+                      <button class="btn btn-sm btn-outline-admin">
+                        <i class="bi bi-eye"></i>
+                      </button>
+                    </td>
+                  </tr>
+                  <tr *ngIf="ultimosPedidos.length === 0">
+                    <td colspan="6" class="text-center text-muted py-4">
+                      <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                      No hay pedidos recientes
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+<!-- Modal Crear Usuario - Estructura Corregida -->
+<div *ngIf="mostrarFormularioUsuario" class="modal-backdrop-gx">
+  <div class="modal-content-admin">
+    <button type="button" class="btn-close-gx" 
+            (click)="mostrarFormularioUsuario = false"
+            [disabled]="creandoUsuario">
+      <i class="bi bi-x"></i>
+    </button>
+    
+    <div class="modal-header-admin">
+      <h5 class="modal-title-admin">
+        <i class="bi bi-person-plus-fill me-2"></i>
+        CREAR NUEVO USUARIO
+      </h5>
+    </div>
+    
+    <div class="modal-body-admin">
+      <form (ngSubmit)="crearUsuario()" #usuarioForm="ngForm">
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label form-label-admin">{{ 'NOMBRE DE USUARIO *' | t }}</label>
+            <input type="text" class="form-control form-control-admin" 
+                   [(ngModel)]="nuevoUsuario.username" name="username" 
+                   placeholder="Ingrese nombre de usuario" required>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label form-label-admin">{{ 'CONTRASEÑA *' | t }}</label>
+            <input type="password" class="form-control form-control-admin" 
+                   [(ngModel)]="nuevoUsuario.password" name="password" 
+                   placeholder="Ingrese contraseña" required>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label form-label-admin">{{ 'NOMBRES *' | t }}</label>
+            <input type="text" class="form-control form-control-admin" 
+                   [(ngModel)]="nuevoUsuario.nombres" name="nombres" 
+                   placeholder="Ingrese nombres" required>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label form-label-admin">{{ 'APELLIDOS *' | t }}</label>
+            <input type="text" class="form-control form-control-admin" 
+                   [(ngModel)]="nuevoUsuario.apellidos" name="apellidos" 
+                   placeholder="Ingrese apellidos" required>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label form-label-admin">{{ 'EMAIL *' | t }}</label>
+            <input type="email" class="form-control form-control-admin" 
+                   [(ngModel)]="nuevoUsuario.email" name="email" 
+                   placeholder="usuario@ejemplo.com" required>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label form-label-admin">{{ 'TELÉFONO *' | t }}</label>
+            <input type="tel" class="form-control form-control-admin" 
+                   [(ngModel)]="nuevoUsuario.telefono" name="telefono" 
+                   placeholder="912345678" required pattern="9[0-9]{8}">
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-4 mb-3">
+            <div class="select-wrapper">
+              <label class="form-label form-label-admin">{{ 'TIPO DOCUMENTO' | t }}</label>
+              <select class="form-select form-control-admin" 
+                      [(ngModel)]="nuevoUsuario.tipoDocumento" name="tipoDocumento">
+                <option value="DNI">{{ 'DNI' | t }}</option>
+                <option value="CE">{{ 'Carnet Extranjería' | t }}</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-md-4 mb-3">
+            <label class="form-label form-label-admin">{{ 'N° DOCUMENTO *' | t }}</label>
+            <input type="text" class="form-control form-control-admin" 
+                   [(ngModel)]="nuevoUsuario.numeroDocumento" name="numeroDocumento" 
+                   placeholder="Número de documento" required>
+          </div>
+          <div class="col-md-4 mb-3">
+            <div class="select-wrapper">
+              <label class="form-label form-label-admin">{{ 'ROL *' | t }}</label>
+              <select class="form-select form-control-admin" 
+                      [(ngModel)]="nuevoUsuario.rol" name="rol">
+                <option value="cliente">{{ 'Cliente' | t }}</option>
+                <option value="repartidor">{{ 'Repartidor' | t }}</option>
+                <option value="logistico">{{ 'Logístico' | t }}</option>
+                <option value="admin">{{ 'Administrador' | t }}</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-end gap-3 mt-4 pt-3 border-top">
+          <button type="button" class="btn btn-outline-admin" 
+                  (click)="mostrarFormularioUsuario = false" 
+                  [disabled]="creandoUsuario">
+            <i class="bi bi-x-circle me-2"></i>CANCELAR
+          </button>
+          <button type="submit" class="btn btn-primary-admin" 
+                  [disabled]="creandoUsuario || usuarioForm.invalid">
+            <span *ngIf="creandoUsuario" class="spinner-border spinner-border-sm me-2"></span>
+            <i class="bi bi-person-plus me-2" *ngIf="!creandoUsuario"></i>
+            {{ creandoUsuario ? 'CREANDO...' : 'CREAR USUARIO' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

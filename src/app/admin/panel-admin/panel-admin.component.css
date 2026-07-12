@@ -1,0 +1,639 @@
+/* Variables de colores */
+:root {
+  --primary-color: #1a1f36;
+  --secondary-color: #2d3748;
+  --accent-green: var(--success);
+  --accent-gold: var(--warning);
+  --accent-blue: var(--brand);
+  --accent-purple: #805ad5;
+  --text-light: #f7fafc;
+  --text-muted: #a0aec0;
+  --border-color: #2d3748;
+  --card-bg: #2d3748;
+  --hover-bg: #4a5568;
+}
+
+/* Estilos generales */
+.admin-panel {
+  background: var(--bg);
+  min-height: 100vh;
+  color: var(--text-light);
+  font-family: var(--font-body);
+}
+
+/* Sidebar */
+.sidebar {
+  background: var(--secondary-color);
+  border-right: 1px solid var(--border-color);
+  transition: all 0.3s ease;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar.collapsed {
+  width: 70px;
+}
+
+.sidebar-brand {
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--primary-color);
+}
+
+.brand-text {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--accent-gold);
+  transition: opacity 0.3s ease;
+}
+
+.sidebar.collapsed .brand-text {
+  opacity: 0;
+}
+
+.sidebar-nav .nav-item {
+  margin: 0.25rem 0;
+}
+
+.sidebar-nav .nav-link {
+  color: var(--text-muted);
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.sidebar-nav .nav-link:hover {
+  background: var(--hover-bg);
+  color: var(--text-light);
+  transform: translateX(5px);
+}
+
+.sidebar-nav .nav-link.active {
+  background: linear-gradient(135deg, var(--brand), var(--accent));
+  color: white;
+  box-shadow: 0 4px 15px rgba(56, 161, 105, 0.3);
+}
+
+.sidebar.collapsed .nav-text {
+  opacity: 0;
+  width: 0;
+}
+
+/* Header */
+.admin-header {
+  background: var(--card-bg);
+  border-bottom: 1px solid var(--border-color);
+  backdrop-filter: blur(10px);
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--brand), var(--accent));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: white;
+}
+
+/* Tarjetas de métricas */
+.metric-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.metric-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--brand), var(--accent));
+}
+
+.metric-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.metric-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.metric-icon.users { background: linear-gradient(135deg, var(--brand), #4E7C4C); }
+.metric-icon.orders { background: linear-gradient(135deg, var(--accent), var(--accent-strong)); }
+.metric-icon.products { background: linear-gradient(135deg, var(--info), #245A75); }
+.metric-icon.revenue { background: linear-gradient(135deg, var(--success), #256B44); }
+
+.metric-value {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.metric-label {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.metric-change {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+}
+
+/* Gráficos y tablas */
+.chart-container {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.chart-header {
+  display: flex;
+  justify-content: between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.chart-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-light);
+}
+
+/* Tabla de pedidos */
+.pedidos-table {
+  background: var(--card-bg);
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+.table {
+  margin: 0;
+  color: var(--text-light);
+}
+
+.table th {
+  background: var(--secondary-color);
+  border: none;
+  padding: 1rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.5px;
+}
+
+.table td {
+  padding: 1rem;
+  border-color: var(--border-color);
+  vertical-align: middle;
+}
+
+/* Badges de estado */
+.badge {
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.badge-pendiente { background: var(--warning-soft); color: var(--warning); }
+.badge-procesando { background: var(--info-soft); color: #1e40af; }
+.badge-enviado { background: var(--accent-soft); color: #be185d; }
+.badge-entregado { background: var(--success-soft); color: var(--success); }
+.badge-cancelado { background: var(--danger-soft); color: var(--danger); }
+
+/* Botones */
+.btn-admin {
+  border: none;
+  border-radius: 0.75rem;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-primary-admin {
+  background: linear-gradient(135deg, var(--brand), var(--accent));
+  color: white;
+}
+
+.btn-primary-admin:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(56, 161, 105, 0.4);
+}
+
+.btn-outline-admin {
+  border: 2px solid var(--border-color);
+  color: var(--text-muted);
+  background: transparent;
+}
+
+.btn-outline-admin:hover {
+  border-color: var(--accent-green);
+  color: var(--accent-green);
+  background: transparent;
+}
+
+/* Modal de crear usuario */
+/* Modal de crear usuario — rediseñado con el sistema Nogal */
+.modal-backdrop-gx {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(18, 22, 16, 0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 1040;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: ng-fade-in .2s var(--ease);
+}
+
+.modal-content-admin {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  color: var(--text-1);
+  position: relative;
+  width: 100%;
+  max-width: 800px;
+  margin: 20px;
+  overflow: hidden;
+}
+.modal-content-admin::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--brand), var(--accent));
+}
+
+.modal-header-admin {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.4rem 2rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.modal-title-admin {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-1);
+  margin: 0;
+}
+
+.modal-body-admin {
+  padding: 2rem;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+/* Botón de cerrar */
+.btn-close-gx {
+  background: var(--surface-2);
+  border: none;
+  border-radius: 8px;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-2);
+  font-size: 1rem;
+  font-weight: bold;
+  transition: background-color var(--t-fast) var(--ease), color var(--t-fast) var(--ease), transform var(--t-fast) var(--ease);
+  cursor: pointer;
+  position: absolute;
+  right: 20px;
+  top: 18px;
+  z-index: 10;
+}
+.btn-close-gx:hover {
+  background: var(--danger-soft);
+  color: var(--danger);
+  transform: scale(1.06);
+}
+
+/* Campos del formulario del modal */
+.modal-body-admin .form-control-admin {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-1);
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: border-color var(--t-fast) var(--ease), box-shadow var(--t-fast) var(--ease);
+  width: 100%;
+}
+.modal-body-admin .form-control-admin:focus {
+  background: var(--surface);
+  border-color: var(--brand);
+  color: var(--text-1);
+  box-shadow: var(--ring);
+  outline: none;
+}
+.modal-body-admin .form-control-admin::placeholder {
+  color: var(--text-3);
+}
+
+/* Select personalizado */
+.modal-body-admin .form-select.form-control-admin {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: none;
+  cursor: pointer;
+  padding-right: 2.4rem;
+}
+.modal-body-admin .form-select.form-control-admin:focus {
+  border-color: var(--brand);
+  box-shadow: var(--ring);
+}
+
+/* Icono para selects */
+.select-wrapper {
+  position: relative;
+}
+.select-wrapper::after {
+  content: '\25BE';
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-3);
+  pointer-events: none;
+  font-size: .85rem;
+}
+
+/* Labels */
+.modal-body-admin .form-label-admin {
+  color: var(--text-2);
+  font-weight: 600;
+  font-size: .82rem;
+  letter-spacing: .03em;
+  margin-bottom: .4rem;
+  display: block;
+}
+
+/* Botones del modal */
+.btn-admin {
+  border: none;
+  border-radius: 10px;
+  padding: .7rem 1.5rem;
+  font-weight: 600;
+  transition: transform var(--t-fast) var(--ease), box-shadow var(--t-fast) var(--ease), background-color var(--t-fast) var(--ease);
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  cursor: pointer;
+}
+
+.modal-body-admin .btn-primary-admin,
+.btn-primary-admin {
+  background: linear-gradient(135deg, var(--brand), var(--accent));
+  color: #fff;
+}
+.btn-primary-admin:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+.btn-primary-admin:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+}
+
+.btn-outline-admin {
+  border: 1.5px solid var(--border-strong);
+  color: var(--text-2);
+  background: transparent;
+}
+.btn-outline-admin:hover:not(:disabled) {
+  border-color: var(--brand);
+  color: var(--brand);
+  background: var(--brand-soft);
+}
+
+/* Animación de entrada */
+@keyframes gxSlideIn {
+  from { opacity: 0; transform: translateY(16px) scale(.98); }
+  to   { opacity: 1; transform: none; }
+}
+.modal-content-admin {
+  animation: gxSlideIn .28s var(--ease);
+}
+
+/* Estados de validación */
+.modal-body-admin .form-control-admin:invalid:not(:focus):not(:placeholder-shown) {
+  border-color: var(--danger);
+}
+.modal-body-admin .form-control-admin:valid:not(:focus):not(:placeholder-shown) {
+  border-color: var(--success);
+}
+
+/* Grupos de formulario */
+.modal-body-admin .row {
+  margin-bottom: 0;
+}
+.modal-body-admin .mb-3 {
+  margin-bottom: 1.1rem !important;
+}
+
+/* Spinner */
+.spinner-border-sm {
+  width: 1rem;
+  height: 1rem;
+  border-width: 2px;
+}
+
+/* Responsive del modal */
+@media (max-width: 768px) {
+  .modal-content-admin {
+    margin: 10px;
+    max-width: 95%;
+  }
+  .modal-body-admin {
+    padding: 1.5rem;
+    max-height: 80vh;
+  }
+  .modal-header-admin {
+    padding: 1rem 1.5rem;
+  }
+  .modal-title-admin {
+    font-size: 1.2rem;
+  }
+  .btn-admin {
+    padding: 10px 20px;
+    font-size: 13px;
+  }
+  .modal-body-admin .form-control-admin,
+  .modal-body-admin .form-select.form-control-admin {
+    padding: 10px 14px;
+    font-size: 13px;
+  }
+}
+
+/* Contenedor de botones */
+.modal-body-admin .border-top {
+  border-color: var(--border) !important;
+  padding-top: 1.5rem;
+}
+
+/* Formularios */
+.form-control-admin {
+  background: var(--surface);
+  border: 1px solid var(--border-color);
+  border-radius: 0.5rem;
+  color: var(--text-light);
+  padding: 0.75rem 1rem;
+}
+
+.form-control-admin:focus {
+  background: var(--secondary-color);
+  border-color: var(--accent-green);
+  color: var(--text-light);
+  box-shadow: 0 0 0 0.2rem rgba(56, 161, 105, 0.25);
+}
+
+.form-label-admin {
+  color: var(--text-muted);
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+/* Animaciones */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.chart-real {
+  height: 250px;
+  min-height: 250px;
+  position: relative;
+}
+
+.venta-bar {
+  transition: all 0.3s ease;
+  min-height: 10px;
+  cursor: pointer;
+  opacity: 0.8;
+}
+
+.venta-bar:hover {
+  opacity: 1;
+  transform: scaleY(1.1);
+}
+
+.venta-bar.bg-warning {
+  opacity: 0.5;
+}
+
+/* Indicador de carga para el gráfico */
+.chart-loading {
+  background: linear-gradient(90deg, var(--surface-2) 25%, var(--surface-3) 50%, var(--surface-2) 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+  height: 200px;
+  border-radius: 0.5rem;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    left: -100%;
+    z-index: 1000;
+    height: 100vh;
+  }
+  
+  .sidebar.show {
+    left: 0;
+  }
+  
+  .metric-card {
+    margin-bottom: 1rem;
+  }
+  
+  .admin-main {
+    margin-left: 0 !important;
+  }
+}
+
+/* Scroll personalizado */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--secondary-color);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--accent-green);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-blue);
+}

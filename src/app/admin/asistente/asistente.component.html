@@ -1,0 +1,54 @@
+<div class="asi-page">
+  <header class="asi-header veta-top">
+    <div class="d-flex align-items-center gap-3">
+      <button class="btn btn-outline-primary btn-sm" routerLink="/panel-admin" aria-label="Volver al panel">
+        <i class="bi bi-arrow-left" aria-hidden="true"></i>
+      </button>
+      <div>
+        <h1 class="asi-titulo"><i class="bi bi-stars me-2" aria-hidden="true"></i>Asistente empresarial</h1>
+        <p class="asi-subtitulo">Motor analítico que responde con los datos reales de tu negocio</p>
+      </div>
+    </div>
+  </header>
+
+  <div class="asi-chat card">
+    <div class="chat-mensajes" role="log" aria-live="polite">
+      <div *ngFor="let m of mensajes()" class="mensaje" [class.de-usuario]="m.autor === 'usuario'">
+        <span class="mensaje-avatar" aria-hidden="true">
+          <i class="bi" [class.bi-stars]="m.autor === 'asistente'" [class.bi-person]="m.autor === 'usuario'"></i>
+        </span>
+        <div class="mensaje-burbuja">
+          <p class="mensaje-texto">{{ m.texto }}</p>
+          <div class="table-responsive" *ngIf="m.tabla">
+            <table class="table table-sm table-hover mb-0">
+              <thead><tr><th *ngFor="let c of m.tabla.columnas">{{ c }}</th></tr></thead>
+              <tbody>
+                <tr *ngFor="let f of m.tabla.filas"><td *ngFor="let celda of f">{{ celda }}</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="pensando()" class="mensaje">
+        <span class="mensaje-avatar" aria-hidden="true"><i class="bi bi-stars"></i></span>
+        <div class="mensaje-burbuja pensando">
+          <span class="punto"></span><span class="punto"></span><span class="punto"></span>
+          <span class="visually-hidden">Analizando tus datos…</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="chat-sugerencias" aria-label="Preguntas sugeridas">
+      <button *ngFor="let s of sugerencias" class="sugerencia" (click)="enviar(s)" [disabled]="pensando()">{{ s }}</button>
+    </div>
+
+    <div class="chat-entrada">
+      <input type="text" class="form-control" placeholder="Pregunta sobre tu negocio…"
+             [(ngModel)]="pregunta" (keyup.enter)="enviar()" aria-label="Pregunta para el asistente">
+      <button class="btn btn-primary" (click)="enviar()" [disabled]="pensando()" aria-label="Enviar pregunta">
+        <i class="bi bi-send" aria-hidden="true"></i>
+      </button>
+    </div>
+  </div>
+</div>

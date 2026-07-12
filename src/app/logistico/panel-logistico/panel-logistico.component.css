@@ -1,0 +1,132 @@
+/* Variables de Color (Bootstrap Overrides y Custom) */
+:root {
+  --primary: var(--brand); /* Azul primario */
+  --secondary: #6c757d; /* Gris secundario */
+  --dark-blue: #212529; /* Casi negro para el header */
+  --light-gray: #f8f9fa; /* Fondo suave */
+  --card-hover-shadow: 0 10px 20px rgba(0, 0, 0, 0.15); /* Sombra elevada */
+}
+
+/* Cuerpo general y fondo */
+body {
+  background-color: var(--light-gray);
+}
+
+/* --- ESTILO DE TARJETAS DE ESTADÍSTICAS --- */
+.card-stats {
+  border: none;
+  overflow: hidden;
+  border-radius: 1rem; /* Bordes más redondeados */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease-in-out;
+}
+
+.card-stats:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: var(--card-hover-shadow);
+}
+
+.card-stats .card-body {
+  padding: 1.5rem;
+}
+
+/* Gradientes para las tarjetas de estadísticas */
+.card-success-gradient {
+  background: linear-gradient(135deg, var(--success), #1e7e34); /* Verde moderno */
+  color: white;
+}
+
+.card-warning-gradient {
+  background: linear-gradient(135deg, #ffc107, #d39e00); /* Amarillo suave */
+  color: var(--text-1) !important;
+}
+
+.card-info-gradient {
+  background: linear-gradient(135deg, var(--info), #117a8b); /* Azul Info */
+  color: white;
+}
+
+/* --- ESTILO DE MÓDULOS LOGÍSTICOS (Tarjetas) --- */
+.card-module {
+  border: 1px solid var(--border);
+  transition: all 0.3s ease-in-out;
+  cursor: pointer;
+  border-radius: 0.75rem;
+}
+
+.card-module:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+  border-color: var(--primary); /* Resaltar borde en hover */
+}
+
+.card-module-primary:hover {
+    border-color: var(--primary);
+}
+.card-module-success:hover {
+    border-color: var(--success);
+}
+.card-module-warning:hover {
+    border-color: #ffc107;
+}
+.card-module-info:hover {
+    border-color: var(--info);
+}
+.card-module-secondary:hover {
+    border-color: var(--secondary);
+}
+
+.icon-lg {
+  font-size: 4rem !important; /* Iconos un poco más grandes para módulos */
+  margin-bottom: 0.5rem;
+  transition: transform 0.3s;
+}
+
+.card-module:hover .icon-lg {
+    transform: scale(1.1); /* Efecto de zoom sutil en el icono */
+}
+
+/* Asegurar que los botones tengan un buen look */
+.btn {
+  border-radius: 0.5rem;
+  font-weight: 500;
+}
+
+/* --- ESTILO DE TABLA DE ALERTA DE STOCK BAJO --- */
+.bg-warning-light {
+    background-color: var(--warning-soft); /* Tono más claro para el header de alerta */
+}
+
+.table th {
+  border-top: none;
+  font-weight: 600;
+  color: var(--text-2); /* Texto de encabezado de tabla más oscuro */
+}
+
+.badge {
+  font-size: 0.85em;
+  padding: 0.5em 0.75em;
+}
+
+/* Media Queries para Responsiveness Mejorado */
+@media (max-width: 767.98px) {
+  /* En móviles, las tarjetas de estadísticas se apilan pero lucen mejor con menos relleno */
+  .card-stats .card-body {
+    padding: 1rem;
+  }
+  .card-stats h2 {
+    font-size: 2rem !important;
+  }
+  .card-stats i {
+    font-size: 2.5rem !important;
+  }
+}
+
+/* Cabecera del panel con identidad de marca */
+.panel-header {
+  background: linear-gradient(120deg, var(--brand-strong) 0%, var(--brand) 70%, var(--accent-strong) 140%);
+  border-bottom: 3px solid var(--accent);
+}
+.panel-header small.text-secondary {
+  color: rgba(255, 255, 255, .75) !important;
+}

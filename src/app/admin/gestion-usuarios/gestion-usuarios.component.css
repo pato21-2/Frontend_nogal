@@ -1,0 +1,162 @@
+/* Layout General Forzado a Oscuro ERP */
+.admin-panel {
+  background-color: var(--bg) !important; 
+  min-height: 100vh;
+  color: var(--text-1) !important;
+  font-family: var(--font-body);
+}
+
+/* Paneles y Contenedores Sólidos */
+.glass-panel, .chart-container, .admin-header {
+  background-color: var(--surface) !important; 
+  border: 1px solid var(--border) !important;
+  border-radius: 1rem;
+}
+
+.glass-panel, .chart-container {
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+}
+
+.admin-header {
+  padding: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  border-bottom: 1px solid var(--border) !important;
+  border-radius: 0;
+}
+
+/* Textos obligatorios en blanco/gris claro */
+h4, h5, label, .kpi-value, .fw-bold, td, th, span, div, strong, li {
+  color: var(--text-1);
+}
+.text-muted, small { color: var(--text-2) !important; }
+.text-gold { color: var(--accent) !important; }
+
+/* Controles de Formulario */
+.form-control-admin, .form-select.form-control-admin {
+  background-color: var(--bg) !important;
+  border: 1px solid var(--border) !important;
+  color: var(--text-1) !important;
+  border-radius: 0.5rem;
+  padding: 0.6rem 1rem;
+}
+.form-control-admin::placeholder { color: var(--text-2) !important; }
+
+/* KPI Cards */
+.kpi-card {
+  background-color: var(--surface) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 1rem;
+  padding: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border-left: 4px solid transparent;
+}
+.border-gold { border-left-color: var(--accent) !important; }
+.border-green { border-left-color: var(--success) !important; }
+.border-danger { border-left-color: var(--danger) !important; }
+.border-warning { border-left-color: var(--accent) !important; }
+.border-info { border-left-color: var(--brand) !important; }
+.border-success { border-left-color: var(--success) !important; }
+
+/* Tabla Empresarial */
+.pedidos-table { margin: 0; }
+.table { color: var(--text-1) !important; }
+.table th {
+  background-color: var(--surface) !important;
+  color: var(--text-2) !important;
+  border-bottom: 2px solid var(--border) !important;
+  padding: 1rem;
+}
+.table td {
+  background-color: transparent !important;
+  color: var(--text-1) !important;
+  border-bottom: 1px solid var(--border) !important;
+  padding: 1rem;
+}
+.table-hover tbody tr:hover td { background-color: var(--border) !important; }
+
+/* Badges y Botones */
+.badge {
+  padding: 0.5em 0.8em;
+  border-radius: 0.4rem;
+}
+.bg-danger { background-color: rgba(239, 68, 68, 0.2) !important; color: var(--danger) !important; border: 1px solid rgba(239, 68, 68, 0.5); }
+.bg-warning { background-color: rgba(245, 158, 11, 0.2) !important; color: var(--accent) !important; border: 1px solid rgba(245, 158, 11, 0.5); }
+.bg-info { background-color: rgba(59, 130, 246, 0.2) !important; color: var(--brand) !important; border: 1px solid rgba(59, 130, 246, 0.5); }
+.bg-success { background-color: rgba(16, 185, 129, 0.2) !important; color: var(--success) !important; border: 1px solid rgba(16, 185, 129, 0.5); }
+.bg-secondary { background-color: rgba(148, 163, 184, 0.2) !important; color: var(--text-2) !important; border: 1px solid rgba(148, 163, 184, 0.5); }
+
+.btn-primary-admin {
+  background: linear-gradient(135deg, var(--brand), var(--accent)) !important;
+  color: white !important;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.6rem 1.2rem;
+}
+.btn-outline-admin {
+  border: 1px solid var(--border) !important;
+  color: var(--text-1) !important;
+  background: transparent !important;
+  border-radius: 0.5rem;
+  padding: 0.6rem 1.2rem;
+}
+.btn-action {
+  background: transparent;
+  border: none;
+  color: var(--text-2) !important;
+  padding: 0.4rem 0.6rem;
+}
+.btn-action:hover {
+  background: var(--border) !important;
+  color: var(--text-1) !important;
+  border-radius: 0.4rem;
+}
+
+/* Modales */
+.dark-modal .modal-content {
+  background-color: var(--surface) !important;
+  border: 1px solid var(--border) !important;
+}
+.dark-modal .modal-header, .dark-modal .modal-footer {
+  border-color: var(--border) !important;
+}
+.dark-modal .btn-close-white {
+  filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+/* Avatar */
+.avatar-circle {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--brand), var(--accent));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: white !important;
+}
+
+/* Paginación */
+.admin-pagination .page-link {
+  background-color: transparent !important;
+  border-color: var(--border) !important;
+  color: var(--text-2) !important;
+}
+.admin-pagination .page-item.active .page-link {
+  background-color: var(--brand) !important;
+  color: white !important;
+}
+.admin-pagination .page-item.disabled .page-link {
+  color: var(--border-strong) !important;
+}
+
+/* Botón de cierre adaptable al tema (el modal ya no es forzado a oscuro) */
+.dark-modal .btn-close-white {
+  filter: none;
+}
+[data-bs-theme='dark'] .dark-modal .btn-close-white {
+  filter: invert(1) grayscale(100%) brightness(200%);
+}

@@ -1,0 +1,87 @@
+<header class="main-header">
+  <div class="header-inner container-fluid">
+
+    <!-- Logo -->
+    <a routerLink="/principal" class="logo" aria-label="Nogal Muebles — inicio">
+      <img src="img/logo-nogal.png" alt="Nogal Muebles" class="logo-image">
+    </a>
+
+    <!-- Búsqueda -->
+    <div class="search-bar d-none d-md-flex">
+      <i class="bi bi-search search-icon" aria-hidden="true"></i>
+      <input type="text" class="search-input" placeholder="Buscar muebles, sillas, mesas...">
+    </div>
+
+    <!-- Acciones -->
+    <div class="auth-section">
+
+      <!-- Cambiar tema -->
+      <button class="icon-btn" type="button" (click)="cambiarTema()"
+              [attr.aria-label]="esTemaOscuro() ? 'Usar tema claro' : 'Usar tema oscuro'"
+              [title]="esTemaOscuro() ? 'Tema claro' : 'Tema oscuro'">
+        <i class="bi" [class.bi-moon-stars]="!esTemaOscuro()" [class.bi-sun]="esTemaOscuro()"></i>
+      </button>
+
+      <!-- Usuario NO autenticado -->
+      <div *ngIf="!estaAutenticado()" class="not-authenticated">
+        <button class="btn btn-ghost" (click)="irALogin()">
+          Iniciar sesión
+        </button>
+        <button class="btn btn-primary" (click)="irARegistro()">
+          Crear cuenta
+        </button>
+      </div>
+
+      <!-- Usuario SÍ autenticado -->
+      <div *ngIf="estaAutenticado()" class="authenticated">
+
+        <!-- Carrito -->
+        <button class="icon-btn cart-btn" (click)="irAlCarrito()" title="Ver carrito" aria-label="Ver carrito">
+          <i class="bi bi-cart3"></i>
+          <span *ngIf="obtenerCantidadCarrito() > 0" class="cart-badge">
+            {{ obtenerCantidadCarrito() }}
+            <span class="visually-hidden">productos en carrito</span>
+          </span>
+        </button>
+
+        <!-- Menú de usuario -->
+        <div class="dropdown d-inline-block">
+          <button class="user-chip dropdown-toggle"
+                  type="button"
+                  id="userDropdown"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false">
+            <span class="user-avatar">{{ obtenerNombreUsuario().charAt(0) | uppercase }}</span>
+            <span class="user-name d-none d-lg-inline">{{ obtenerNombreUsuario() }}</span>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+            <li>
+              <a class="dropdown-item" href="javascript:void(0)" routerLink="/perfil">
+                <i class="bi bi-person me-2"></i>Mi perfil
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item" href="javascript:void(0)" routerLink="/mis-pedidos">
+                <i class="bi bi-bag me-2"></i>Mis pedidos
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item" href="javascript:void(0)" routerLink="/carrito">
+                <i class="bi bi-cart3 me-2"></i>Carrito de compras
+                <span *ngIf="obtenerCantidadCarrito() > 0"
+                      class="badge bg-primary ms-2">{{ obtenerCantidadCarrito() }}</span>
+              </a>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <a class="dropdown-item text-danger" href="javascript:void(0)" (click)="cerrarSesion()">
+                <i class="bi bi-box-arrow-right me-2"></i>Cerrar sesión
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</header>

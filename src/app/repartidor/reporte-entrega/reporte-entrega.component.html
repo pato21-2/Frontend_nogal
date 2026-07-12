@@ -1,0 +1,58 @@
+<div class="reporte-entrega">
+  <button 
+    *ngIf="!mostrarFormulario"
+    class="btn btn-primary"
+    (click)="toggleFormulario()">
+    📋 Registrar Entrega
+  </button>
+
+  <div *ngIf="mostrarFormulario" class="formulario-reporte">
+    <h4>Registrar Entrega - Pedido #{{pedido.numeroPedido}}</h4>
+    
+    <div class="form-group">
+      <label for="codigoVerificacion">🔢 Código de Verificación *</label>
+      <input
+        type="text"
+        id="codigoVerificacion"
+        [(ngModel)]="reporte.codigoVerificacion"
+        placeholder="Ingresa el código proporcionado por el cliente"
+        class="form-control"
+        required>
+    </div>
+
+    <div class="form-group">
+      <label for="fotoEvidencia">📸 Foto de Evidencia</label>
+      <input
+        type="file"
+        id="fotoEvidencia"
+        (change)="onImagenSeleccionada($event)"
+        accept="image/*"
+        class="form-control">
+      <small class="text-muted">Toma una foto del paquete entregado</small>
+    </div>
+
+    <div class="form-group">
+      <label for="observaciones">📝 Observaciones</label>
+      <textarea
+        id="observaciones"
+        [(ngModel)]="reporte.observaciones"
+        placeholder="Observaciones adicionales..."
+        class="form-control"
+        rows="3"></textarea>
+    </div>
+
+    <div class="form-actions">
+      <button 
+        class="btn btn-success"
+        (click)="crearReporte()"
+        [disabled]="!reporte.codigoVerificacion">
+        ✅ Confirmar Entrega
+      </button>
+      <button 
+        class="btn btn-secondary"
+        (click)="toggleFormulario()">
+        ❌ Cancelar
+      </button>
+    </div>
+  </div>
+</div>

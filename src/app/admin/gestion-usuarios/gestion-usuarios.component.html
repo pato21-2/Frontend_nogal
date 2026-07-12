@@ -1,0 +1,327 @@
+<div class="admin-panel">
+  <header class="admin-header sticky-top p-3 glass-effect">
+    <div class="container-fluid d-flex justify-content-between align-items-center">
+      <div class="d-flex align-items-center">
+        <button class="btn btn-outline-admin me-3" (click)="volverAlPanel()">
+          <i class="bi bi-arrow-left"></i>
+        </button>
+        <h4 class="mb-0 text-gold fw-bold">{{ 'Gestión de Usuarios' | t }}</h4>
+      </div>
+      <div class="d-flex gap-2">
+        <button class="btn btn-outline-admin" (click)="exportar('excel')">
+          <i class="bi bi-file-earmark-excel"></i> Exportar
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container-fluid py-4">
+    <div class="row g-3 mb-4 animate-fade-in-up">
+      <div class="col-md-2 col-sm-4 col-6">
+        <div class="kpi-card border-gold">
+          <i class="bi bi-people-fill text-gold kpi-icon"></i>
+          <div class="kpi-data">
+            <span class="kpi-title">{{ 'Total' | t }}</span>
+            <h3 class="kpi-value">{{ kpis.total }}</h3>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2 col-sm-4 col-6">
+        <div class="kpi-card border-green">
+          <i class="bi bi-person-check-fill text-success kpi-icon"></i>
+          <div class="kpi-data">
+            <span class="kpi-title">{{ 'Activos' | t }}</span>
+            <h3 class="kpi-value">{{ kpis.activos }}</h3>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2 col-sm-4 col-6">
+        <div class="kpi-card border-danger">
+          <i class="bi bi-shield-lock-fill text-danger kpi-icon"></i>
+          <div class="kpi-data">
+            <span class="kpi-title">{{ 'Admins' | t }}</span>
+            <h3 class="kpi-value">{{ kpis.admins }}</h3>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2 col-sm-4 col-6">
+        <div class="kpi-card border-warning">
+          <i class="bi bi-box-seam text-warning kpi-icon"></i>
+          <div class="kpi-data">
+            <span class="kpi-title">{{ 'Logísticos' | t }}</span>
+            <h3 class="kpi-value">{{ kpis.logisticos }}</h3>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2 col-sm-4 col-6">
+        <div class="kpi-card border-info">
+          <i class="bi bi-truck text-info kpi-icon"></i>
+          <div class="kpi-data">
+            <span class="kpi-title">{{ 'Repartidores' | t }}</span>
+            <h3 class="kpi-value">{{ kpis.repartidores }}</h3>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2 col-sm-4 col-6">
+        <div class="kpi-card border-success">
+          <i class="bi bi-shop text-success kpi-icon"></i>
+          <div class="kpi-data">
+            <span class="kpi-title">{{ 'Clientes' | t }}</span>
+            <h3 class="kpi-value">{{ kpis.clientes }}</h3>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="chart-container glass-panel animate-fade-in-up">
+      <div class="row g-3 mb-4">
+        <div class="col-md-3">
+          <label class="form-label form-label-admin">{{ 'Rol' | t }}</label>
+          <select class="form-select form-control-admin" [(ngModel)]="filtroRol" (change)="aplicarFiltros()">
+            <option value="">{{ 'Todos los roles' | t }}</option>
+            <option value="admin">{{ 'Administradores' | t }}</option>
+            <option value="logistico">{{ 'Logísticos' | t }}</option>
+            <option value="repartidor">{{ 'Repartidores' | t }}</option>
+            <option value="cliente">{{ 'Clientes' | t }}</option>
+          </select>
+        </div>
+        <div class="col-md-7">
+          <label class="form-label form-label-admin">{{ 'Buscar' | t }}</label>
+          <div class="input-group">
+            <span class="input-group-text bg-secondary border-color text-muted"><i class="bi bi-search"></i></span>
+            <input type="text" class="form-control form-control-admin border-start-0" 
+                   placeholder="Buscar por ID, nombre o correo..."
+                   [(ngModel)]="filtroBusqueda" (input)="aplicarFiltros()">
+          </div>
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+          <button class="btn btn-outline-admin w-100" (click)="limpiarFiltros()">
+            <i class="bi bi-eraser"></i> Limpiar
+          </button>
+        </div>
+      </div>
+
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="text-muted small">
+          Mostrando {{ usuariosFiltrados.length }} de {{ totalRegistros }} registros
+        </div>
+        <select class="form-select form-select-sm w-auto form-control-admin" [(ngModel)]="registrosPorPagina" (change)="aplicarFiltros()">
+          <option [value]="10">10 por página</option>
+          <option [value]="25">25 por página</option>
+          <option [value]="50">50 por página</option>
+        </select>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-hover pedidos-table align-middle m-0">
+          <thead>
+            <tr>
+              <th>{{ 'ID Sistema' | t }}</th>
+              <th>{{ 'Nombres Completos' | t }}</th>
+              <th>{{ 'Contacto' | t }}</th>
+              <th>{{ 'Rol' | t }}</th>
+              <th>{{ 'Estado' | t }}</th>
+              <th class="text-center">{{ 'Acciones' | t }}</th>
+            </tr>
+          </thead>
+          
+          <tbody *ngIf="cargando">
+            <tr *ngFor="let i of [1,2,3,4,5]">
+              <td colspan="6"><div class="skeleton-box"></div></td>
+            </tr>
+          </tbody>
+
+          <tbody *ngIf="!cargando">
+            <tr *ngFor="let usuario of usuariosFiltrados">
+              <td><span class="text-muted fw-bold">{{ usuario.codigoUsuario }}</span></td>
+              <td>
+                <div class="d-flex align-items-center gap-3">
+                  <div class="avatar-circle shadow-sm">{{ usuario.nombres.charAt(0) }}{{ usuario.apellidos.charAt(0) }}</div>
+                  <div>
+                    <div class="fw-bold text-light">{{ usuario.nombres }} {{ usuario.apellidos }}</div>
+                    <small class="text-muted"><i class="bi bi-person"></i> {{ usuario.username }}</small>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="small text-light">{{ usuario.email }}</div>
+                <div class="small text-muted"><i class="bi bi-telephone"></i> {{ usuario.telefono }}</div>
+              </td>
+              <td><span [class]="'badge shadow-sm ' + getClaseRol(usuario.rol)">{{ usuario.rol }}</span></td>
+              <td><span [class]="'badge shadow-sm ' + getClaseEstado(usuario.estado)">{{ usuario.estado }}</span></td>
+              
+              <td class="text-center">
+                <div class="btn-group">
+                  <button class="btn btn-sm btn-action" title="Ver Detalle" data-bs-toggle="modal" data-bs-target="#modalDetalle" (click)="verDetalle(usuario)">
+                    <i class="bi bi-eye text-info"></i>
+                  </button>
+                  <ng-container *ngIf="puedeEditar">
+                    <button class="btn btn-sm btn-action" [title]="'Editar' | t" data-bs-toggle="modal" data-bs-target="#modalUsuario" (click)="editarUsuario(usuario)">
+                      <i class="bi bi-pencil text-warning"></i>
+                    </button>
+                    <button class="btn btn-sm btn-action" title="Reset Password" data-bs-toggle="modal" data-bs-target="#modalReset" (click)="verDetalle(usuario)">
+                      <i class="bi bi-key text-success"></i>
+                    </button>
+                    <button *ngIf="usuario.estado === 'ACTIVO'" class="btn btn-sm btn-action" [title]="'Desactivar' | t" data-bs-toggle="modal" data-bs-target="#modalDesactivar" (click)="confirmarDesactivacion(usuario)">
+                      <i class="bi bi-person-dash text-danger"></i>
+                    </button>
+                  </ng-container>
+                </div>
+              </td>
+            </tr>
+            <tr *ngIf="usuariosFiltrados.length === 0">
+              <td colspan="6" class="text-center text-muted py-5">
+                <i class="bi bi-inbox fs-1 d-block mb-3"></i>
+                No se encontraron registros que coincidan con los filtros.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      
+      <nav *ngIf="!cargando && totalRegistros > registrosPorPagina" class="mt-4 d-flex justify-content-end">
+        <ul class="pagination pagination-sm admin-pagination mb-0">
+          <li class="page-item" [class.disabled]="paginaActual === 1">
+            <a class="page-link" role="button" (click)="cambiarPagina(paginaActual - 1)">{{ 'Anterior' | t }}</a>
+          </li>
+          <li class="page-item active"><a class="page-link">{{ paginaActual }}</a></li>
+          <li class="page-item" [class.disabled]="paginaActual * registrosPorPagina >= totalRegistros">
+            <a class="page-link" role="button" (click)="cambiarPagina(paginaActual + 1)">{{ 'Siguiente' | t }}</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </main>
+</div>
+
+<div class="modal fade dark-modal" id="modalUsuario" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title fw-bold text-gold">
+          <i class="bi bi-pencil-square"></i>
+          {{ 'Editar Usuario' | t }}
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form #formUsuario="ngForm">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label form-label-admin">{{ 'Username *' | t }}</label>
+              <input type="text" class="form-control form-control-admin" name="username" 
+                     [(ngModel)]="usuarioSeleccionado.username" required placeholder="Ej: admin_nogal">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label form-label-admin">{{ 'Contraseña *' | t }}</label>
+              <input type="password" class="form-control form-control-admin" name="password" 
+                     [(ngModel)]="usuarioSeleccionado.password" [required]="!usuarioSeleccionado.id" placeholder="Obligatorio">
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label form-label-admin">{{ 'Nombres *' | t }}</label>
+              <input type="text" class="form-control form-control-admin" name="nombres" [(ngModel)]="usuarioSeleccionado.nombres" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label form-label-admin">{{ 'Apellidos *' | t }}</label>
+              <input type="text" class="form-control form-control-admin" name="apellidos" [(ngModel)]="usuarioSeleccionado.apellidos" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label form-label-admin">{{ 'Correo Electrónico *' | t }}</label>
+              <input type="email" class="form-control form-control-admin" name="email" [(ngModel)]="usuarioSeleccionado.email" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label form-label-admin">Teléfono</label>
+              <input type="text" class="form-control form-control-admin" name="telefono" [(ngModel)]="usuarioSeleccionado.telefono">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label form-label-admin">{{ 'Rol del Sistema' | t }}</label>
+              <select class="form-select form-control-admin" name="rol" [(ngModel)]="usuarioSeleccionado.rol">
+                <option value="admin">{{ 'Administrador' | t }}</option>
+                <option value="logistico">{{ 'Logístico' | t }}</option>
+                <option value="repartidor">{{ 'Repartidor' | t }}</option>
+                <option value="cliente">{{ 'Cliente' | t }}</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label form-label-admin">{{ 'Tipo Doc.' | t }}</label>
+              <select class="form-select form-control-admin" name="tipoDoc" [(ngModel)]="usuarioSeleccionado.tipoDocumento">
+                <option value="DNI">{{ 'DNI' | t }}</option>
+                <option value="CE">{{ 'Carnet Extranjería' | t }}</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label form-label-admin">{{ 'N° Documento' | t }}</label>
+              <input type="text" class="form-control form-control-admin" name="numDoc" [(ngModel)]="usuarioSeleccionado.numeroDocumento">
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer border-top-0">
+        <button type="button" class="btn btn-outline-admin" data-bs-dismiss="modal">{{ 'Cancelar' | t }}</button>
+        <button type="button" class="btn btn-primary-admin" (click)="guardarUsuario()" [disabled]="formUsuario.invalid || procesando">
+          <span *ngIf="procesando" class="spinner-border spinner-border-sm me-2"></span>
+          {{ procesando ? 'Guardando...' : 'Guardar Cambios' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade dark-modal" id="modalDesactivar" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content glass-panel">
+      <div class="modal-header border-bottom-0">
+        <h5 class="modal-title text-danger"><i class="bi bi-exclamation-triangle-fill"></i> {{ 'Confirmar Desactivación' | t }}</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p class="mb-1">{{ '¿Está seguro que desea desactivar al usuario' | t }} <strong>{{ usuarioSeleccionado.nombres }} {{ usuarioSeleccionado.apellidos }}</strong>?</p>
+        <p class="text-muted small">Esta acción revocará su acceso al sistema ERP NOGAL inmediatamente. Ningún registro asociado (pedidos, logs) será eliminado.</p>
+      </div>
+      <div class="modal-footer border-top-0">
+        <button type="button" class="btn btn-outline-admin" data-bs-dismiss="modal">{{ 'Cancelar' | t }}</button>
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">{{ 'Confirmar Desactivación' | t }}</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade dark-modal" id="modalDetalle" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content glass-panel">
+      <div class="modal-header border-bottom-0">
+        <h5 class="modal-title text-light"><i class="bi bi-person-badge"></i> Ficha de Usuario</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="text-center mb-4">
+          <div class="avatar-circle mx-auto mb-2" style="width: 80px; height: 80px; font-size: 2rem;">
+            {{ usuarioSeleccionado.nombres?.charAt(0) }}{{ usuarioSeleccionado.apellidos?.charAt(0) }}
+          </div>
+          <h5 class="mb-0">{{ usuarioSeleccionado.nombres }} {{ usuarioSeleccionado.apellidos }}</h5>
+          <span class="text-muted">{{ usuarioSeleccionado.codigoUsuario }}</span>
+        </div>
+        <ul class="list-group list-group-flush bg-transparent">
+          <li class="list-group-item bg-transparent text-light border-secondary d-flex justify-content-between">
+            <span class="text-muted">Username</span> <strong>{{ usuarioSeleccionado.username }}</strong>
+          </li>
+          <li class="list-group-item bg-transparent text-light border-secondary d-flex justify-content-between">
+            <span class="text-muted">{{ 'Documento' | t }}</span> <strong>{{ usuarioSeleccionado.tipoDocumento }} {{ usuarioSeleccionado.numeroDocumento }}</strong>
+          </li>
+          <li class="list-group-item bg-transparent text-light border-secondary d-flex justify-content-between">
+            <span class="text-muted">{{ 'Rol' | t }}</span> 
+            <span [class]="'badge ' + getClaseRol(usuarioSeleccionado.rol || '')">{{ usuarioSeleccionado.rol }}</span>
+          </li>
+          <li class="list-group-item bg-transparent text-light border-secondary d-flex justify-content-between">
+            <span class="text-muted">{{ 'Estado' | t }}</span> 
+            <span [class]="'badge ' + getClaseEstado(usuarioSeleccionado.estado || '')">{{ usuarioSeleccionado.estado }}</span>
+          </li>
+        </ul>
+      </div>
+      <div class="modal-footer border-top-0">
+        <button type="button" class="btn btn-outline-admin w-100" data-bs-dismiss="modal">{{ 'Cerrar' | t }}</button>
+      </div>
+    </div>
+  </div>
+</div>

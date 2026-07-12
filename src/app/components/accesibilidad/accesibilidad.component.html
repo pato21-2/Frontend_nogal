@@ -1,0 +1,173 @@
+<!-- Línea guía de lectura -->
+<div class="linea-guia"
+     *ngIf="acc.opciones().lineaGuia"
+     [style.top.px]="posicionGuiaY()"
+     aria-hidden="true"></div>
+
+<!-- Botón flotante -->
+<button class="acc-boton-flotante"
+        type="button"
+        (click)="alternarPanel()"
+        [attr.aria-expanded]="abierto()"
+        aria-controls="panel-accesibilidad"
+        aria-label="Opciones de accesibilidad"
+        title="Accesibilidad">
+  <i class="bi bi-universal-access-circle" aria-hidden="true"></i>
+</button>
+
+<!-- Panel de opciones -->
+<div class="acc-panel"
+     id="panel-accesibilidad"
+     *ngIf="abierto()"
+     role="dialog"
+     aria-label="Panel de accesibilidad">
+
+  <div class="acc-panel-cabecera">
+    <h2 class="acc-titulo">
+      <i class="bi bi-universal-access" aria-hidden="true"></i>
+      Accesibilidad
+    </h2>
+    <button class="acc-cerrar" type="button" (click)="cerrarPanel()" aria-label="Cerrar panel de accesibilidad">
+      <i class="bi bi-x-lg" aria-hidden="true"></i>
+    </button>
+  </div>
+
+  <div class="acc-panel-cuerpo">
+
+    <!-- Lectura -->
+    <section class="acc-seccion" aria-labelledby="acc-lectura">
+      <h3 id="acc-lectura" class="acc-seccion-titulo">Lectura</h3>
+
+      <label class="acc-conmutador">
+        <input type="checkbox"
+               [checked]="acc.opciones().fuenteDislexia"
+               (change)="acc.alternarFuenteDislexia()">
+        <span class="acc-conmutador-pista" aria-hidden="true"></span>
+        <span class="acc-conmutador-texto">
+          Tipografía para dislexia
+          <small>OpenDyslexic (o Comic Sans como alternativa)</small>
+        </span>
+      </label>
+
+      <label class="acc-conmutador">
+        <input type="checkbox"
+               [checked]="acc.opciones().lecturaEspaciada"
+               (change)="acc.alternarLecturaEspaciada()">
+        <span class="acc-conmutador-pista" aria-hidden="true"></span>
+        <span class="acc-conmutador-texto">
+          Espaciado de lectura
+          <small>Más espacio entre letras, palabras y líneas</small>
+        </span>
+      </label>
+
+      <label class="acc-conmutador">
+        <input type="checkbox"
+               [checked]="acc.opciones().lineaGuia"
+               (change)="acc.alternarLineaGuia()">
+        <span class="acc-conmutador-pista" aria-hidden="true"></span>
+        <span class="acc-conmutador-texto">
+          Línea guía de lectura
+          <small>Una barra horizontal sigue tu cursor</small>
+        </span>
+      </label>
+    </section>
+
+    <!-- Tamaño del texto -->
+    <section class="acc-seccion" aria-labelledby="acc-texto">
+      <h3 id="acc-texto" class="acc-seccion-titulo">Tamaño del texto</h3>
+      <div class="acc-grupo-botones" role="group" aria-label="Escala del texto">
+        <button *ngFor="let e of escalas"
+                type="button"
+                class="acc-chip"
+                [class.activo]="acc.opciones().escalaTexto === e"
+                [attr.aria-pressed]="acc.opciones().escalaTexto === e"
+                (click)="acc.fijarEscalaTexto(e)">
+          {{ e }}%
+        </button>
+      </div>
+      <p class="acc-nota">También puedes usar el zoom del navegador (Ctrl y +) hasta 200 %.</p>
+    </section>
+
+    <!-- Texto a voz -->
+    <section class="acc-seccion" aria-labelledby="acc-voz" *ngIf="acc.sintesisDisponible">
+      <h3 id="acc-voz" class="acc-seccion-titulo">Texto a voz</h3>
+      <p class="acc-nota">Selecciona un texto y pulsa «Escuchar», o escucha toda la página.</p>
+      <div class="acc-grupo-botones acc-voz-controles">
+        <button type="button" class="acc-boton acc-boton-primario"
+                (click)="acc.leer()"
+                [disabled]="acc.estadoVoz() === 'leyendo'">
+          <i class="bi bi-volume-up-fill" aria-hidden="true"></i> Escuchar
+        </button>
+        <button type="button" class="acc-boton"
+                (click)="acc.pausarLectura()"
+                [disabled]="acc.estadoVoz() !== 'leyendo'">
+          <i class="bi bi-pause-fill" aria-hidden="true"></i> Pausar
+        </button>
+        <button type="button" class="acc-boton"
+                (click)="acc.reanudarLectura()"
+                [disabled]="acc.estadoVoz() !== 'pausado'">
+          <i class="bi bi-play-fill" aria-hidden="true"></i> Reanudar
+        </button>
+        <button type="button" class="acc-boton"
+                (click)="acc.detenerLectura()"
+                [disabled]="acc.estadoVoz() === 'inactivo'">
+          <i class="bi bi-stop-fill" aria-hidden="true"></i> Detener
+        </button>
+      </div>
+      <p class="acc-estado" aria-live="polite">
+        <ng-container [ngSwitch]="acc.estadoVoz()">
+          <span *ngSwitchCase="'leyendo'"><i class="bi bi-soundwave" aria-hidden="true"></i> Leyendo…</span>
+          <span *ngSwitchCase="'pausado'"><i class="bi bi-pause-circle" aria-hidden="true"></i> Lectura en pausa</span>
+          <span *ngSwitchDefault></span>
+        </ng-container>
+      </p>
+    </section>
+
+    <!-- Visión del color -->
+    <section class="acc-seccion" aria-labelledby="acc-color">
+      <h3 id="acc-color" class="acc-seccion-titulo">Visión del color</h3>
+      <div class="acc-grupo-botones" role="group" aria-label="Filtros de color">
+        <button *ngFor="let f of filtros"
+                type="button"
+                class="acc-chip"
+                [class.activo]="acc.opciones().filtroColor === f.valor"
+                [attr.aria-pressed]="acc.opciones().filtroColor === f.valor"
+                (click)="acc.fijarFiltroColor(f.valor)">
+          {{ f.etiqueta }}
+        </button>
+      </div>
+    </section>
+
+    <button type="button" class="acc-boton acc-restablecer" (click)="acc.restablecer()">
+      <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
+      Restablecer todo
+    </button>
+  </div>
+</div>
+
+<!-- Filtros SVG de corrección para daltonismo (matrices de realce de contraste cromático) -->
+<svg class="acc-svg-filtros" aria-hidden="true" focusable="false">
+  <defs>
+    <filter id="filtro-deuteranopia">
+      <feColorMatrix in="SourceGraphic" type="matrix"
+        values="1.05 -0.05 0     0 0
+                -0.25 1.35 -0.10 0 0
+                0     -0.05 1.05 0 0
+                0     0     0    1 0"/>
+    </filter>
+    <filter id="filtro-protanopia">
+      <feColorMatrix in="SourceGraphic" type="matrix"
+        values="1.35 -0.25 -0.10 0 0
+                -0.05 1.10 -0.05 0 0
+                -0.05 -0.05 1.10 0 0
+                0     0     0    1 0"/>
+    </filter>
+    <filter id="filtro-tritanopia">
+      <feColorMatrix in="SourceGraphic" type="matrix"
+        values="1.05 0     -0.05 0 0
+                0    1.10  -0.10 0 0
+                -0.10 -0.25 1.35 0 0
+                0    0     0    1 0"/>
+    </filter>
+  </defs>
+</svg>

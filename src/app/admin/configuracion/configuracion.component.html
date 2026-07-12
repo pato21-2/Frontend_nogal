@@ -1,0 +1,103 @@
+<div class="admin-panel">
+  <!-- Header -->
+  <header class="admin-header sticky-top p-3">
+    <div class="container-fluid">
+      <div class="d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center">
+          <button class="btn btn-outline-admin me-3" (click)="volverAlPanel()">
+            <i class="bi bi-arrow-left"></i>
+          </button>
+          <h4 class="mb-0 text-gold">{{ 'Configuración del Sistema' | t }}</h4>
+        </div>
+        <button class="btn btn-primary-admin" (click)="guardarConfiguracion()">
+          <i class="bi bi-check-circle"></i> {{ 'Guardar Cambios' | t }}
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Content -->
+  <main class="container-fluid py-4">
+    <div class="row">
+      <div class="col-lg-8">
+        <div class="chart-container">
+          <h5 class="chart-title mb-4">{{ 'Preferencias del Sistema' | t }}</h5>
+          
+          <!-- Configuraciones -->
+          <div class="configuracion-item mb-4">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <h6 class="mb-1">{{ 'Notificaciones por Email' | t }}</h6>
+                <p class="text-muted mb-0">{{ 'Recibir notificaciones de pedidos y reportes' | t }}</p>
+              </div>
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" [(ngModel)]="configuraciones.notificaciones">
+              </div>
+            </div>
+          </div>
+
+          <div class="configuracion-item mb-4">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <h6 class="mb-1">{{ 'Reportes Automáticos' | t }}</h6>
+                <p class="text-muted mb-0">{{ 'Generar reportes semanales automáticamente' | t }}</p>
+              </div>
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" [(ngModel)]="configuraciones.reportesAutomaticos">
+              </div>
+            </div>
+          </div>
+
+          <div class="configuracion-item mb-4">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <h6 class="mb-1">{{ 'Modo Oscuro' | t }}</h6>
+                <p class="text-muted mb-0">{{ 'Interfaz con tema oscuro' | t }}</p>
+              </div>
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" [(ngModel)]="configuraciones.modoOscuro" (change)="cambiarModoOscuro()">
+              </div>
+            </div>
+          </div>
+
+          <div class="configuracion-item">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <h6 class="mb-1">{{ 'Idioma' | t }}</h6>
+                <p class="text-muted mb-0">{{ 'Idioma de la interfaz' | t }}</p>
+              </div>
+              <select class="form-select form-control-admin" style="width: 200px;" [(ngModel)]="configuraciones.idioma" (change)="cambiarIdioma()">
+                <option value="es">{{ 'Español' | t }}</option>
+                <option value="en">{{ 'English' | t }}</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4">
+        <div class="chart-container">
+          <h5 class="chart-title mb-4">{{ 'Información del Sistema' | t }}</h5>
+          <div class="system-info">
+            <div class="d-flex justify-content-between py-2 border-bottom border-secondary">
+              <span class="text-muted">{{ 'Versión:' | t }}</span>
+              <span class="fw-bold">v1.0.0</span>
+            </div>
+            <div class="d-flex justify-content-between py-2 border-bottom border-secondary">
+              <span class="text-muted">{{ 'Última Actualización:' | t }}</span>
+              <span class="fw-bold">2024</span>
+            </div>
+            <div class="d-flex justify-content-between py-2 border-bottom border-secondary">
+              <span class="text-muted">{{ 'Usuarios Registrados:' | t }}</span>
+              <span class="fw-bold text-success">45</span>
+            </div>
+            <div class="d-flex justify-content-between py-2">
+              <span class="text-muted">{{ 'Estado:' | t }}</span>
+              <span class="badge bg-success">{{ 'Operativo' | t }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>

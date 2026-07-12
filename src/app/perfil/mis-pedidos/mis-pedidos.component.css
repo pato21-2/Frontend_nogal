@@ -1,0 +1,367 @@
+/* Tabla de pedidos */
+.table {
+  background: var(--surface);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.table thead {
+  background-color: var(--brand);
+  color: white;
+}
+
+.table thead th {
+  border: none;
+  font-weight: 600;
+  padding: 15px;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+}
+
+.table tbody td {
+  padding: 15px;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--border);
+}
+
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.table tbody tr:hover {
+  background-color: rgba(44, 85, 48, 0.05);
+  cursor: pointer;
+}
+
+/* Badges de estado */
+.badge-estado {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.badge-pendiente {
+  background-color: #ffc107;
+  color: #000;
+}
+
+.badge-procesando {
+  background-color: var(--info);
+  color: white;
+}
+
+.badge-enviado {
+  background-color: var(--brand);
+  color: white;
+}
+
+.badge-entregado {
+  background-color: var(--success);
+  color: white;
+}
+
+.badge-cancelado {
+  background-color: var(--danger);
+  color: white;
+}
+
+/* Botones de acción */
+.btn-group-sm > .btn {
+  padding: 5px 10px;
+  font-size: 0.8rem;
+}
+
+/* Cards responsive */
+.pedido-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 15px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.pedido-card:hover {
+  box-shadow: 0 4px 15px rgba(0,0,0,0.12);
+  transform: translateY(-2px);
+}
+
+.pedido-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+.pedido-numero {
+  font-weight: 700;
+  color: var(--brand);
+  font-size: 1.1rem;
+}
+
+.pedido-info {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.pedido-info-item {
+  font-size: 0.9rem;
+}
+
+.pedido-info-label {
+  color: var(--text-2);
+  font-weight: 500;
+}
+
+.pedido-info-value {
+  color: var(--text-1);
+  font-weight: 600;
+}
+
+.pedido-acciones {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* Empty state */
+.empty-state {
+  background: var(--surface);
+  border-radius: 16px;
+  padding: 60px 40px;
+  text-align: center;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.empty-state i {
+  font-size: 5rem;
+  color: #dee2e6;
+  margin-bottom: 20px;
+}
+
+/* Filtros */
+.filters-card {
+  background: var(--surface);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+/* Loading */
+.loading-container {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.spinner-border {
+  width: 3rem;
+  height: 3rem;
+}
+
+/* Breadcrumb */
+.breadcrumb {
+  background: transparent;
+  padding: 0;
+  margin: 0;
+}
+
+.breadcrumb-item a {
+  color: var(--brand);
+  text-decoration: none;
+}
+
+.breadcrumb-item.active {
+  color: var(--text-2);
+}
+
+/* Modal de detalle */
+.modal-header {
+  background-color: var(--brand);
+  color: white;
+}
+
+.modal-header .btn-close {
+  filter: brightness(0) invert(1);
+}
+
+.detalle-producto {
+  border-bottom: 1px solid var(--border);
+  padding: 15px 0;
+}
+
+.detalle-producto:last-child {
+  border-bottom: none;
+}
+
+.detalle-resumen {
+  background: var(--surface-2);
+  padding: 15px;
+  border-radius: 8px;
+  margin-top: 20px;
+}
+
+/* Estilo para el código de verificación */
+.codigo-verificacion {
+  font-family: 'Courier New', monospace;
+  letter-spacing: 2px;
+  background: linear-gradient(135deg, var(--brand), #4E7C4C);
+  color: white;
+  padding: 12px 20px;
+  border-radius: 8px;
+  text-align: center;
+  margin: 10px 0;
+}
+
+.codigo-verificacion .codigo-texto {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.codigo-verificacion .codigo-descripcion {
+  font-size: 0.8rem;
+  opacity: 0.9;
+}
+
+/* Mejorar el badge del código en la tabla */
+.badge.bg-primary {
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  font-size: 0.75rem;
+}
+
+/* Notificaciones/Mensajes flotantes */
+.position-fixed {
+  animation: slideInRight 0.3s ease-out;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  border: none;
+  border-radius: 8px;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .table-responsive {
+    font-size: 0.85rem;
+  }
+  
+  .pedido-info {
+    grid-template-columns: 1fr;
+  }
+  
+  .pedido-card {
+    padding: 15px;
+  }
+  
+  .btn-group-sm > .btn {
+    width: 100%;
+    margin-bottom: 5px;
+  }
+
+  .codigo-verificacion {
+    padding: 10px 15px;
+  }
+
+  .codigo-verificacion .codigo-texto {
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .filters-card {
+    padding: 15px;
+  }
+  
+  .empty-state {
+    padding: 40px 20px;
+  }
+  
+  .empty-state i {
+    font-size: 3rem;
+  }
+
+  .position-fixed {
+    right: 10px !important;
+    left: 10px !important;
+    min-width: auto !important;
+  }
+}
+
+/* Animaciones */
+.fade-in {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Tooltip */
+.tooltip-inner {
+  background-color: var(--brand);
+}
+
+.bs-tooltip-auto[data-popper-placement^="top"] .tooltip-arrow::before,
+.bs-tooltip-top .tooltip-arrow::before {
+  border-top-color: var(--brand);
+}
+
+/* Estilos adicionales para mejor UX */
+.text-center {
+  text-align: center;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+/* Mejoras visuales para el modal */
+.modal-body {
+  scrollbar-width: thin;
+  scrollbar-color: var(--brand) #f8f9fa;
+}
+
+.modal-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+  background: var(--surface-2);
+  border-radius: 3px;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+  background: var(--brand);
+  border-radius: 3px;
+}
+
+.modal-body::-webkit-scrollbar-thumb:hover {
+  background: #1e3a23;
+}

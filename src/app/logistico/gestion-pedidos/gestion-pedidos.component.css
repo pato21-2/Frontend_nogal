@@ -1,0 +1,16 @@
+.codigo-verificacion {
+  background: linear-gradient(135deg, #e8f5e8, #f0f8f0);
+  border: 2px dashed var(--success);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  color: #198754;
+}
+
+/* Badge para el estado del código */
+.badge-codigo {
+  font-size: 0.75em;
+  background-color: #6c757d;
+  color: white;
+}

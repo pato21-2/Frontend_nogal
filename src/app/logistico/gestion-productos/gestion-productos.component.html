@@ -1,0 +1,485 @@
+<div class="container-fluid">
+  <div class="row bg-primary text-white py-3">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <h3 class="mb-0">
+            <i class="bi bi-box-seam me-2"></i>
+            Gestión de Productos
+          </h3>
+          <small>Administrar catálogo de productos y stock</small>
+        </div>
+        <div>
+          <button class="btn btn-outline-light me-2" (click)="cancelar()">
+            <i class="bi bi-arrow-left me-1"></i> Volver
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container mt-4">
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-body">
+            <div class="row align-items-center">
+              
+              <div class="col-md-12"> <div class="row g-2 align-items-center">
+
+                  <div class="col-auto me-2">
+                    <div class="btn-group btn-group-sm">
+                      <button class="btn btn-outline-secondary" 
+                              [class.active]="vista === 'lista'"
+                              (click)="cambiarVista('lista')">
+                        <i class="bi bi-list"></i>
+                      </button>
+                      <button class="btn btn-outline-secondary" 
+                              [class.active]="vista === 'grid'"
+                              (click)="cambiarVista('grid')">
+                        <i class="bi bi-grid-3x3"></i>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <input type="text" class="form-control form-control-sm" 
+                           [(ngModel)]="filtroNombre"
+                           (input)="aplicarFiltros()"
+                           placeholder="Buscar producto...">
+                  </div>
+                  <div class="col-md-2">
+                    <select class="form-select form-select-sm" 
+                            [(ngModel)]="filtroCategoria"
+                            (change)="aplicarFiltros()">
+                      <option value="">Todas categorías</option>
+                      <option *ngFor="let cat of categorias" [value]="cat.nombre">
+                        {{ cat.nombre }}
+                      </option>
+                    </select>
+                  </div>
+                  <div class="col-md-2">
+                    <select class="form-select form-select-sm" 
+                            [(ngModel)]="filtroProveedor"
+                            (change)="aplicarFiltros()">
+                      <option value="">Todos proveedores</option>
+                      <option *ngFor="let prov of proveedores" [value]="prov.nombre">
+                        {{ prov.nombre }}
+                      </option>
+                    </select>
+                  </div>
+                  <div class="col-md-2">
+                    <select class="form-select form-select-sm" 
+                            [(ngModel)]="filtroStock"
+                            (change)="aplicarFiltros()">
+                      <option value="todos">Todo stock</option>
+                      <option value="bajo">Stock bajo</option>
+                      <option value="sin">Sin stock</option>
+                      <option value="suficiente">Stock suficiente</option>
+                    </select>
+                  </div>
+                  <div class="col-md-1">
+                    <button class="btn btn-outline-secondary btn-sm w-100" 
+                            (click)="limpiarFiltros()" title="Limpiar filtros">
+                      <i class="bi bi-arrow-clockwise"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row" *ngIf="vista === 'lista'">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header bg-light d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">
+              Lista de Productos 
+              <span class="badge bg-primary ms-2">{{ productosFiltrados.length }}</span>
+            </h5>
+            <small class="text-muted">
+              Mostrando {{ productosFiltrados.length }} de {{ productos.length }} productos
+            </small>
+          </div>
+          <div class="card-body">
+            <div *ngIf="cargando" class="text-center py-4">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Cargando...</span>
+              </div>
+              <p class="mt-2">Cargando productos...</p>
+            </div>
+
+            <div *ngIf="!cargando && productosFiltrados.length === 0" class="text-center py-4">
+              <i class="bi bi-inbox" style="font-size: 3rem; color: #6c757d;"></i>
+              <p class="mt-2 text-muted">No se encontraron productos</p>
+              <button class="btn btn-primary" (click)="limpiarFiltros()">
+                <i class="bi bi-arrow-clockwise me-1"></i>
+                Limpiar filtros
+              </button>
+            </div>
+
+            <div *ngIf="!cargando && productosFiltrados.length > 0" class="table-responsive">
+              <table class="table table-striped table-hover">
+                <thead class="table-dark">
+                  <tr>
+                    <th width="250">Producto</th>
+                    <th>Categoría</th>
+                    <th>Proveedor</th>
+                    <th>Material</th>
+                    <th>Precios</th>
+                    <th>Stock</th>
+                    <th>Estado</th>
+                    <th width="140">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let producto of productosFiltrados">
+                    <td>
+                      <div class="d-flex align-items-center">
+                        <div class="me-3" *ngIf="producto.imagenUrl">
+                          <img [src]="producto.imagenUrl" 
+                                 alt="{{ producto.nombre }}"
+                                 class="rounded" 
+                                 style="width: 40px; height: 40px; object-fit: cover;">
+                        </div>
+                        <div>
+                          <strong class="d-block">{{ producto.nombre }}</strong>
+                          <small class="text-muted" *ngIf="producto.dimensiones">
+                            {{ producto.dimensiones }}
+                          </small>
+                          <small class="text-muted d-block" *ngIf="producto.color">
+                            Color: {{ producto.color }}
+                          </small>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <span class="badge bg-info">{{ producto.categoria.nombre }}</span>
+                    </td>
+                    <td>
+                      <small>
+                        {{ producto.proveedor.nombre }}
+                        <br>
+                        <span class="text-muted">{{ producto.proveedor.materialEspecialidad }}</span>
+                      </small>
+                    </td>
+                    <td>{{ producto.material || 'No especificado' }}</td>
+                    <td>
+                      <div class="text-nowrap">
+                        <small class="text-muted d-block">Compra: S/ {{ producto.precioCompra | number:'1.2-2' }}</small>
+                        <strong class="text-success">Venta: S/ {{ producto.precioVenta | number:'1.2-2' }}</strong>
+                      </div>
+                    </td>
+                    <td>
+                      <span class="badge" [ngClass]="getClaseStock(producto.stock)">
+                        {{ producto.stock }} unidades
+                      </span>
+                      <br>
+                      <small class="text-muted">{{ getTextoStock(producto.stock) }}</small>
+                    </td>
+                    <td>
+                      <span *ngIf="producto.activo" class="badge bg-success">Activo</span>
+                      <span *ngIf="!producto.activo" class="badge bg-danger">Inactivo</span>
+                    </td>
+                    <td>
+                      <div class="btn-group btn-group-sm">
+                        <button class="btn btn-outline-primary" 
+                                (click)="abrirModalEditar(modalProducto, producto)"
+                                title="Editar">
+                          <i class="bi bi-pencil"></i>
+                        </button>
+                        <button class="btn btn-outline-danger" 
+                                (click)="abrirModalEliminar(modalEliminar, producto)"
+                                title="Eliminar">
+                          <i class="bi bi-trash"></i>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row" *ngIf="vista === 'grid'">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header bg-light d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">
+              Vista de Grid 
+              <span class="badge bg-primary ms-2">{{ productosFiltrados.length }}</span>
+            </h5>
+          </div>
+          <div class="card-body">
+            <div *ngIf="cargando" class="text-center py-4">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Cargando...</span>
+              </div>
+            </div>
+
+            <div *ngIf="!cargando && productosFiltrados.length === 0" class="text-center py-4">
+              <i class="bi bi-inbox" style="font-size: 3rem; color: #6c757d;"></i>
+              <p class="mt-2 text-muted">No se encontraron productos</p>
+            </div>
+
+            <div class="row" *ngIf="!cargando && productosFiltrados.length > 0">
+              <div class="col-xl-3 col-lg-4 col-md-6 mb-4" *ngFor="let producto of productosFiltrados">
+                <div class="card h-100 product-card">
+                  <div class="card-header bg-transparent border-bottom-0">
+                    <div class="d-flex justify-content-between align-items-start">
+                      <span class="badge bg-info">{{ producto.categoria.nombre }}</span>
+                      <span class="badge" [ngClass]="getClaseStock(producto.stock)">
+                        {{ producto.stock }}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <div class="card-body text-center">
+                    <div class="product-image mb-3">
+                      <i class="bi bi-box-seam" 
+                         style="font-size: 3rem; color: #6c757d;"
+                         *ngIf="!producto.imagenUrl"></i>
+                      <img *ngIf="producto.imagenUrl" 
+                           [src]="producto.imagenUrl" 
+                           [alt]="producto.nombre"
+                           class="img-fluid rounded"
+                           style="max-height: 120px; object-fit: cover;">
+                    </div>
+                    
+                    <h6 class="card-title">{{ producto.nombre }}</h6>
+                    
+                    <div class="product-details">
+                      <small class="text-muted d-block">
+                        <strong>Proveedor:</strong> {{ producto.proveedor.nombre }}
+                      </small>
+                      <small class="text-muted d-block">
+                        <strong>Material:</strong> {{ producto.material || 'N/A' }}
+                      </small>
+                      <small class="text-muted d-block" *ngIf="producto.color">
+                        <strong>Color:</strong> {{ producto.color }}
+                      </small>
+                    </div>
+
+                    <div class="product-prices mt-2">
+                      <div class="text-success fw-bold">
+                        S/ {{ producto.precioVenta | number:'1.2-2' }}
+                      </div>
+                      <small class="text-muted">
+                        Costo: S/ {{ producto.precioCompra | number:'1.2-2' }}
+                      </small>
+                    </div>
+                  </div>
+
+                  <div class="card-footer bg-transparent">
+                    <div class="btn-group w-100">
+                      <button class="btn btn-outline-primary btn-sm" 
+                              (click)="abrirModalEditar(modalProducto, producto)">
+                        <i class="bi bi-pencil"></i>
+                      </button>
+                      <button class="btn btn-outline-danger btn-sm" 
+                              (click)="abrirModalEliminar(modalEliminar, producto)">
+                        <i class="bi bi-trash"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #modalProducto let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">
+      <i class="bi bi-box-seam me-2"></i>
+      {{ esEdicion ? 'Editar Producto' : 'Nuevo Producto' }}
+    </h5>
+    <button type="button" class="btn-close" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+    <form (ngSubmit)="guardarProducto()">
+      <div class="row">
+        <div class="col-md-8 mb-3">
+          <label class="form-label">Nombre del Producto *</label>
+          <input type="text" class="form-control" 
+                 [(ngModel)]="productoEdicion.nombre" 
+                 name="nombre" required
+                 placeholder="Ej: Mesa de Pino para 6 personas">
+        </div>
+        <div class="col-md-4 mb-3">
+          <label class="form-label">Stock Inicial</label>
+          <input type="number" class="form-control" 
+                 [(ngModel)]="productoEdicion.stock" 
+                 name="stock" min="0"
+                 placeholder="0">
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Proveedor *</label>
+          <select class="form-select" 
+                   [(ngModel)]="productoEdicion.proveedor.id" 
+                   name="proveedorId" required>
+            <option value="">Seleccione proveedor</option>
+            <option *ngFor="let prov of proveedores" [value]="prov.id">
+              {{ prov.nombre }} - {{ prov.materialEspecialidad }}
+            </option>
+          </select>
+        </div>
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Categoría *</label>
+          <select class="form-select" 
+                   [(ngModel)]="productoEdicion.categoria.nombre" 
+                   name="categoria" required>
+            <option value="">Seleccione categoría</option>
+            <option *ngFor="let cat of categorias" [value]="cat.nombre">
+              {{ cat.nombre }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Precio de Compra *</label>
+          <div class="input-group">
+            <span class="input-group-text">S/</span>
+            <input type="number" class="form-control" 
+                   [(ngModel)]="productoEdicion.precioCompra" 
+                   name="precioCompra" step="0.01" min="0" required>
+          </div>
+        </div>
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Precio de Venta *</label>
+          <div class="input-group">
+            <span class="input-group-text">S/</span>
+            <input type="number" class="form-control" 
+                   [(ngModel)]="productoEdicion.precioVenta" 
+                   name="precioVenta" step="0.01" min="0" required>
+            <button type="button" class="btn btn-outline-secondary" 
+                     (click)="productoEdicion.precioVenta = productoEdicion.precioCompra * 1.6">
+              +60%
+            </button>
+          </div>
+          <small class="text-muted">
+            Margen: {{ ((productoEdicion.precioVenta - productoEdicion.precioCompra) / productoEdicion.precioCompra * 100) | number:'1.0-0' }}%
+          </small>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-4 mb-3">
+          <label class="form-label">Material</label>
+          <input type="text" class="form-control" 
+                 [(ngModel)]="productoEdicion.material" 
+                 name="material"
+                 placeholder="Ej: Madera Pino, Plástico, Melamina">
+        </div>
+        <div class="col-md-4 mb-3">
+          <label class="form-label">Color</label>
+          <input type="text" class="form-control" 
+                 [(ngModel)]="productoEdicion.color" 
+                 name="color"
+                 placeholder="Ej: Natural, Negro, Blanco">
+        </div>
+        <div class="col-md-4 mb-3">
+          <label class="form-label">URL de Imagen</label>
+          <input type="text" class="form-control" 
+                 [(ngModel)]="productoEdicion.imagenUrl" 
+                 name="imagenUrl"
+                 placeholder="https://...">
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Dimensiones</label>
+          <input type="text" class="form-control" 
+                 [(ngModel)]="productoEdicion.dimensiones" 
+                 name="dimensiones"
+                 placeholder="Ej: 1.20m x 0.80m x 0.75m">
+        </div>
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Descripción</label>
+          <input type="text" class="form-control" 
+                 [(ngModel)]="productoEdicion.descripcion" 
+                 name="descripcion"
+                 placeholder="Descripción breve del producto">
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Características</label>
+        <textarea class="form-control" 
+                  [(ngModel)]="productoEdicion.caracteristicas" 
+                  name="caracteristicas" rows="3"
+                  placeholder="Ej: Patas reforzadas, superficie lisa, resistencia al agua..."></textarea>
+      </div>
+
+      <div class="mb-3">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" 
+                 [(ngModel)]="productoEdicion.activo" 
+                 name="activo" id="activo">
+          <label class="form-check-label" for="activo">
+            Producto activo (visible en tienda)
+          </label>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">
+      Cancelar
+    </button>
+    <button type="button" class="btn btn-primary" 
+            (click)="guardarProducto()" [disabled]="cargando">
+      <span *ngIf="cargando" class="spinner-border spinner-border-sm me-1"></span>
+      {{ esEdicion ? 'Actualizar' : 'Crear' }} Producto
+    </button>
+  </div>
+</ng-template>
+
+<ng-template #modalEliminar let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title text-danger">
+      <i class="bi bi-exclamation-triangle me-2"></i>
+      Confirmar Eliminación
+    </h5>
+    <button type="button" class="btn-close" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="modal-body">
+    <p>¿Estás seguro de que deseas eliminar el producto?</p>
+    <div class="alert alert-warning">
+      <strong>{{ productoEdicion.nombre }}</strong><br>
+      <small>
+        Categoría: {{ productoEdicion.categoria.nombre }}<br>
+        Proveedor: {{ productoEdicion.proveedor.nombre }}
+      </small>
+    </div>
+    <p class="text-muted small">
+      <i class="bi bi-info-circle me-1"></i>
+      El producto se marcará como inactivo y no aparecerá en la tienda.
+    </p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">
+      Cancelar
+    </button>
+    <button type="button" class="btn btn-danger" 
+            (click)="eliminarProducto()" [disabled]="cargando">
+      <span *ngIf="cargando" class="spinner-border spinner-border-sm me-1"></span>
+      Eliminar Producto
+    </button>
+  </div>
+</ng-template>

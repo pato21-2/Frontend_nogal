@@ -1,0 +1,153 @@
+<div class="crm-page">
+  <header class="crm-header veta-top">
+    <div class="d-flex align-items-center gap-3">
+      <button class="btn btn-outline-primary btn-sm" routerLink="/panel-admin" aria-label="Volver al panel">
+        <i class="bi bi-arrow-left" aria-hidden="true"></i>
+      </button>
+      <div>
+        <h1 class="crm-titulo"><i class="bi bi-people me-2" aria-hidden="true"></i>CRM — Cartera de clientes</h1>
+        <p class="crm-subtitulo">Valor de vida, ranking, estado comercial y línea de tiempo de cada cliente</p>
+      </div>
+    </div>
+  </header>
+
+  <div *ngIf="exito" class="alert alert-success" role="status">
+    <i class="bi bi-check-circle-fill me-1" aria-hidden="true"></i> {{ exito }}
+  </div>
+  <div *ngIf="error" class="alert alert-danger" role="alert">
+    <i class="bi bi-exclamation-triangle-fill me-1" aria-hidden="true"></i> {{ error }}
+  </div>
+
+  <div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+      <span>Clientes ({{ clientesFiltrados.length }})</span>
+      <div class="d-flex gap-2 flex-wrap">
+        <input type="search" class="form-control form-control-sm" style="width:230px"
+               placeholder="Buscar por nombre o email…" [(ngModel)]="busqueda" aria-label="Buscar cliente">
+        <select class="form-select form-select-sm" style="width:170px" [(ngModel)]="filtroEstado" aria-label="Filtrar por estado comercial">
+          <option value="">Todos los estados</option>
+          <option value="VIP">VIP</option>
+          <option value="FRECUENTE">Frecuente</option>
+          <option value="ACTIVO">Activo</option>
+          <option value="NUEVO">Nuevo</option>
+          <option value="INACTIVO">Inactivo</option>
+          <option value="POTENCIAL">Potencial</option>
+        </select>
+      </div>
+    </div>
+    <div class="card-body table-responsive">
+      <div *ngIf="cargando" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status"><span class="visually-hidden">Cargando…</span></div>
+      </div>
+      <table class="table table-hover align-middle" *ngIf="!cargando">
+        <thead>
+          <tr><th>#</th><th>Cliente</th><th>Contacto</th><th>Pedidos</th><th>CLV</th><th>Ticket prom.</th><th>Última compra</th><th>Estado</th><th></th></tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let c of clientesFiltrados">
+            <td><span class="crm-ranking" *ngIf="c.ranking">{{ c.ranking }}</span></td>
+            <td class="fw-bold">{{ c.nombre }}</td>
+            <td><small>{{ c.email }}<br>{{ c.telefono }}</small></td>
+            <td>{{ c.pedidos }}</td>
+            <td class="fw-bold">S/ {{ c.clv | number:'1.2-2' }}</td>
+            <td>S/ {{ c.ticketPromedio | number:'1.2-2' }}</td>
+            <td>{{ c.ultimaCompra ? (c.ultimaCompra | date:'dd/MM/yyyy') : '—' }}</td>
+            <td><span class="badge" [ngClass]="claseEstado(c.estadoComercial)">{{ c.estadoComercial }}</span></td>
+            <td>
+              <button class="btn btn-sm btn-outline-primary" (click)="abrirFicha(c)"
+                      [attr.aria-label]="'Ver ficha 360 de ' + c.nombre">
+                <i class="bi bi-person-vcard me-1" aria-hidden="true"></i> Ficha 360
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="clientesFiltrados.length === 0">
+            <td colspan="9" class="text-center text-muted py-4">Sin clientes que coincidan con el filtro</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Ficha 360 -->
+  <div class="crm-overlay" *ngIf="ficha || cargandoFicha" (click)="cerrarFicha()">
+    <div class="crm-ficha" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" aria-label="Ficha 360 del cliente">
+      <div *ngIf="cargandoFicha" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status"><span class="visually-hidden">Cargando…</span></div>
+      </div>
+
+      <ng-container *ngIf="ficha">
+        <div class="ficha-cabecera">
+          <div class="d-flex align-items-center gap-3">
+            <span class="ficha-avatar">{{ ficha.nombre.charAt(0) | uppercase }}</span>
+            <div>
+              <h5 class="mb-0">{{ ficha.nombre }}</h5>
+              <small class="text-muted">{{ ficha.email }} · {{ ficha.telefono }} · Doc. {{ ficha.documento }}</small>
+            </div>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <span class="badge" [ngClass]="claseEstado(ficha.estadoComercial)">{{ ficha.estadoComercial }}</span>
+            <button class="btn btn-sm btn-outline-secondary" (click)="cerrarFicha()" aria-label="Cerrar ficha">
+              <i class="bi bi-x-lg" aria-hidden="true"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="ficha-metricas">
+          <div><span>Valor de vida (CLV)</span><strong>S/ {{ ficha.clv | number:'1.2-2' }}</strong></div>
+          <div><span>Pedidos</span><strong>{{ ficha.pedidos }}</strong></div>
+          <div><span>Ticket promedio</span><strong>S/ {{ ficha.ticketPromedio | number:'1.2-2' }}</strong></div>
+          <div><span>Cliente desde</span><strong>{{ ficha.primeraCompra ? (ficha.primeraCompra | date:'MM/yyyy') : '—' }}</strong></div>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h6 class="mb-0"><i class="bi bi-clock-history me-1" aria-hidden="true"></i> Línea de tiempo</h6>
+          <button class="btn btn-sm btn-primary" (click)="registrando = !registrando">
+            <i class="bi bi-plus-lg me-1" aria-hidden="true"></i> Registrar interacción
+          </button>
+        </div>
+
+        <div class="ficha-form anim-fade-up" *ngIf="registrando">
+          <div class="row g-2">
+            <div class="col-md-4">
+              <label class="form-label" for="intTipo">Tipo</label>
+              <select id="intTipo" class="form-select form-select-sm" [(ngModel)]="interaccion.tipo">
+                <option *ngFor="let t of tiposInteraccion" [value]="t">{{ t }}</option>
+              </select>
+            </div>
+            <div class="col-md-8">
+              <label class="form-label" for="intProx">Próxima acción (opcional)</label>
+              <input id="intProx" class="form-control form-control-sm" [(ngModel)]="interaccion.proximaAccion"
+                     placeholder="Ej.: llamar la próxima semana para cerrar la venta">
+            </div>
+            <div class="col-12">
+              <label class="form-label" for="intNotas">Notas *</label>
+              <textarea id="intNotas" class="form-control form-control-sm" rows="2" [(ngModel)]="interaccion.notas"
+                        placeholder="¿Qué se conversó con el cliente?"></textarea>
+            </div>
+            <div class="col-12 text-end">
+              <button class="btn btn-sm btn-primary" (click)="guardarInteraccion()">Guardar</button>
+            </div>
+          </div>
+        </div>
+
+        <ul class="timeline">
+          <li *ngFor="let e of ficha.timeline">
+            <span class="timeline-icono" [ngClass]="'tl-' + e.tipo.toLowerCase()">
+              <i class="bi" [ngClass]="iconoEvento(e.tipo)" aria-hidden="true"></i>
+            </span>
+            <div class="timeline-cuerpo">
+              <div class="d-flex justify-content-between gap-2">
+                <strong>{{ e.tipo }}</strong>
+                <small class="text-muted">{{ e.fecha | slice:0:10 }}</small>
+              </div>
+              <p>{{ e.descripcion }}</p>
+            </div>
+          </li>
+          <li *ngIf="ficha.timeline.length === 0" class="text-muted text-center py-3">
+            Sin actividad registrada todavía
+          </li>
+        </ul>
+      </ng-container>
+    </div>
+  </div>
+</div>

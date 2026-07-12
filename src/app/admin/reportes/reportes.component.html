@@ -1,0 +1,165 @@
+<div class="admin-panel">
+  <!-- Header -->
+  <header class="admin-header sticky-top p-3">
+    <div class="container-fluid">
+      <div class="d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center">
+          <button class="btn btn-outline-admin me-3" (click)="volverAlPanel()">
+            <i class="bi bi-arrow-left"></i>
+          </button>
+          <h4 class="mb-0 text-gold">Reportes y Análisis</h4>
+        </div>
+        <div>
+          <button class="btn btn-primary-admin me-2" (click)="exportarExcel()">
+            <i class="bi bi-file-earmark-excel"></i> Exportar Excel
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Content -->
+  <main class="container-fluid py-4">
+    <!-- Filtros de Fecha -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="chart-container">
+          <div class="row">
+            <div class="col-md-4">
+              <label class="form-label form-label-admin">Fecha Inicio</label>
+              <input type="date" class="form-control form-control-admin" [(ngModel)]="fechaInicio">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label form-label-admin">Fecha Fin</label>
+              <input type="date" class="form-control form-control-admin" [(ngModel)]="fechaFin">
+            </div>
+            <div class="col-md-4 d-flex align-items-end">
+              <button class="btn btn-primary-admin w-100" (click)="generarReporte()">
+                <i class="bi bi-graph-up"></i> Generar Reporte
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Resumen de Ventas -->
+    <div class="row mb-4">
+      <div class="col-md-4">
+        <div class="metric-card">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <div class="metric-value text-success">{{ formatearMoneda(estadisticas.totalVentas30Dias) }}</div>
+              <div class="metric-label">Ventas 30 Días</div>
+            </div>
+            <i class="bi bi-currency-dollar fs-2 text-success"></i>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="metric-card">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <div class="metric-value text-info">{{ formatearMoneda(estadisticas.promedioDiario) }}</div>
+              <div class="metric-label">Promedio Diario</div>
+            </div>
+            <i class="bi bi-graph-up fs-2 text-info"></i>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="metric-card">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <div class="metric-value text-warning">{{ productosMasVendidos.length }}</div>
+              <div class="metric-label">Productos Analizados</div>
+            </div>
+            <i class="bi bi-box-seam fs-2 text-warning"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Gráfico ECharts - ÚNICO GRÁFICO -->
+    <div class="row">
+      <div class="col-12 mb-4">
+        <div class="chart-container">
+          <div class="chart-header">
+            <h5 class="chart-title">Productos Más Vendidos - Distribución</h5>
+          </div>
+          
+          <!-- Contenedor del gráfico ECharts -->
+          <div *ngIf="isChartReady" class="echarts-container">
+            <div echarts [options]="chartOption" [autoResize]="true" style="height: 500px; width: 100%;"></div>
+          </div>
+
+          <!-- Mensaje de carga -->
+          <div *ngIf="cargando" class="text-center text-muted py-5">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Cargando...</span>
+            </div>
+            <p class="mt-3">Cargando datos del gráfico...</p>
+          </div>
+
+          <!-- Mensaje sin datos -->
+          <div *ngIf="!cargando && !isChartReady" class="text-center text-muted py-5">
+            <i class="bi bi-pie-chart fs-1 d-block mb-3"></i>
+            <p>No hay datos suficientes para mostrar el gráfico</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabla detallada de productos más vendidos -->
+    <div class="row" *ngIf="productosMasVendidos.length > 0">
+      <div class="col-12">
+        <div class="chart-container">
+          <div class="chart-header">
+            <h5 class="chart-title">Detalle de Productos Más Vendidos</h5>
+          </div>
+          <div class="table-responsive">
+            <table class="table table-hover productos-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Producto</th>
+                  <th>Cantidad Vendida</th>
+                  <th>Ventas Totales</th>
+                  <th>Precio Promedio</th>
+                  <th>Participación</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let producto of productosMasVendidos; let i = index">
+                  <td>
+                    <span class="badge bg-primary">{{ i + 1 }}</span>
+                  </td>
+                  <td>
+                    <strong>{{ producto.nombre }}</strong>
+                  </td>
+                  <td>
+                    <span class="text-success fw-bold">{{ producto.cantidadTotal | number }}</span> unidades
+                  </td>
+                  <td>
+                    <span class="text-info fw-bold">{{ formatearMoneda(producto.ventasTotal) }}</span>
+                  </td>
+                  <td>
+                    <span class="text-warning">{{ formatearMoneda(producto.precioPromedio || 0) }}</span>
+                  </td>
+                  <td>
+                    <div class="progress" style="height: 10px;">
+                      <div class="progress-bar bg-success" 
+                           [style.width]="(producto.cantidadTotal / getTotalVendido()) * 100 + '%'">
+                      </div>
+                    </div>
+                    <small class="text-muted">{{ ((producto.cantidadTotal / getTotalVendido()) * 100).toFixed(1) }}%</small>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>

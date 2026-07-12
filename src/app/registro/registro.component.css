@@ -1,0 +1,39 @@
+/* Página de registro: misma familia visual que el login */
+.auth-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 3rem 1rem;
+  background:
+    radial-gradient(60rem 30rem at 110% -10%, var(--brand-soft), transparent 60%),
+    radial-gradient(50rem 26rem at -10% 110%, var(--accent-soft), transparent 55%),
+    var(--bg);
+}
+
+.auth-card {
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+}
+
+.auth-head {
+  padding: 2rem 2rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+}
+.auth-title {
+  font-weight: 700;
+  margin-bottom: .25rem;
+}
+.auth-subtitle {
+  color: var(--text-2);
+  font-size: .92rem;
+  margin: 0;
+  font-family: var(--font-body);
+  font-weight: 400;
+}
+
+.card-body { padding: 2rem; }
+
+@media (max-width: 575.98px) {
+  .auth-head, .card-body { padding: 1.4rem; }
+}

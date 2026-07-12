@@ -1,0 +1,271 @@
+<div class="bi-page">
+  <header class="bi-header veta-top">
+    <div class="d-flex align-items-center gap-3">
+      <button class="btn btn-outline-primary btn-sm" routerLink="/panel-admin" aria-label="Volver al panel">
+        <i class="bi bi-arrow-left" aria-hidden="true"></i>
+      </button>
+      <div>
+        <h1 class="bi-titulo"><i class="bi bi-graph-up-arrow me-2" aria-hidden="true"></i>Centro de Business Intelligence</h1>
+        <p class="bi-subtitulo">Indicadores ejecutivos y análisis del negocio en tiempo real</p>
+      </div>
+    </div>
+    <div class="d-flex gap-2">
+      <button class="btn btn-outline-primary btn-sm" (click)="imprimir()">
+        <i class="bi bi-printer me-1" aria-hidden="true"></i> Imprimir / PDF
+      </button>
+    </div>
+  </header>
+
+  <!-- Carga / error -->
+  <div *ngIf="cargando" class="bi-cargando">
+    <div class="spinner-border text-primary" role="status"><span class="visually-hidden">Cargando…</span></div>
+    <p>Calculando indicadores del negocio…</p>
+  </div>
+  <div *ngIf="error && !cargando" class="alert alert-danger" role="alert">
+    <i class="bi bi-exclamation-triangle-fill me-1" aria-hidden="true"></i> {{ error }}
+  </div>
+
+  <ng-container *ngIf="!cargando && !error">
+
+    <!-- KPIs ejecutivos -->
+    <section class="kpi-grid" aria-label="Indicadores clave">
+      <div class="kpi">
+        <span class="kpi-etiqueta">Ventas de hoy</span>
+        <span class="kpi-valor">S/ {{ kpis.ventasHoy | number:'1.2-2' }}</span>
+        <small>{{ kpis.pedidosHoy }} pedidos</small>
+      </div>
+      <div class="kpi">
+        <span class="kpi-etiqueta">Ventas del mes</span>
+        <span class="kpi-valor">S/ {{ kpis.ventasMes | number:'1.2-2' }}</span>
+        <small>{{ kpis.pedidosMes }} pedidos</small>
+      </div>
+      <div class="kpi">
+        <span class="kpi-etiqueta">Utilidad del mes</span>
+        <span class="kpi-valor">S/ {{ kpis.utilidadMes | number:'1.2-2' }}</span>
+        <small>Margen {{ kpis.margenMesPct }}%</small>
+      </div>
+      <div class="kpi" [class.kpi-positivo]="variacionVentas >= 0" [class.kpi-negativo]="variacionVentas < 0">
+        <span class="kpi-etiqueta">Ventas 30 días</span>
+        <span class="kpi-valor">S/ {{ kpis.ventas30d | number:'1.2-2' }}</span>
+        <small>
+          <i class="bi" [class.bi-arrow-up-right]="variacionVentas >= 0" [class.bi-arrow-down-right]="variacionVentas < 0" aria-hidden="true"></i>
+          {{ variacionVentas }}% vs. periodo anterior
+        </small>
+      </div>
+      <div class="kpi">
+        <span class="kpi-etiqueta">Ticket promedio</span>
+        <span class="kpi-valor">S/ {{ kpis.ticketPromedio30d | number:'1.2-2' }}</span>
+        <small>últimos 30 días</small>
+      </div>
+      <div class="kpi">
+        <span class="kpi-etiqueta">Clientes nuevos</span>
+        <span class="kpi-valor">{{ kpis.clientesNuevos30d }}</span>
+        <small>{{ kpis.clientesActivos30d }} activos (30 d)</small>
+      </div>
+      <div class="kpi" [class.kpi-alerta]="kpis.stockCritico > 0">
+        <span class="kpi-etiqueta">Stock crítico</span>
+        <span class="kpi-valor">{{ kpis.stockCritico }}</span>
+        <small>productos bajo mínimo</small>
+      </div>
+      <div class="kpi">
+        <span class="kpi-etiqueta">Valor de inventario</span>
+        <span class="kpi-valor">S/ {{ kpis.valorInventario | number:'1.2-2' }}</span>
+        <small>a costo de compra</small>
+      </div>
+    </section>
+
+    <!-- Pestañas -->
+    <nav class="bi-tabs" role="tablist" aria-label="Secciones de análisis">
+      <button role="tab" [attr.aria-selected]="pestania === 'ventas'" [class.activa]="pestania === 'ventas'" (click)="cambiarPestania('ventas')">
+        <i class="bi bi-cart-check me-1" aria-hidden="true"></i> Ventas
+      </button>
+      <button role="tab" [attr.aria-selected]="pestania === 'inventario'" [class.activa]="pestania === 'inventario'" (click)="cambiarPestania('inventario')">
+        <i class="bi bi-boxes me-1" aria-hidden="true"></i> Inventario
+      </button>
+      <button role="tab" [attr.aria-selected]="pestania === 'finanzas'" [class.activa]="pestania === 'finanzas'" (click)="cambiarPestania('finanzas')">
+        <i class="bi bi-cash-stack me-1" aria-hidden="true"></i> Finanzas
+      </button>
+      <button role="tab" [attr.aria-selected]="pestania === 'operacion'" [class.activa]="pestania === 'operacion'" (click)="cambiarPestania('operacion')">
+        <i class="bi bi-truck me-1" aria-hidden="true"></i> Operación
+      </button>
+    </nav>
+
+    <!-- ===== VENTAS ===== -->
+    <section *ngIf="pestania === 'ventas'" class="bi-grid" role="tabpanel">
+      <div class="card bi-card bi-ancha">
+        <div class="card-header">Evolución de ventas — últimos 30 días</div>
+        <div class="card-body"><div echarts [options]="chartVentasDiarias" class="grafico"></div></div>
+      </div>
+      <div class="card bi-card bi-ancha">
+        <div class="card-header">Comparativa mensual — últimos 12 meses</div>
+        <div class="card-body"><div echarts [options]="chartVentasMensuales" class="grafico"></div></div>
+      </div>
+      <div class="card bi-card">
+        <div class="card-header">Productos más vendidos</div>
+        <div class="card-body"><div echarts [options]="chartTopProductos" class="grafico"></div></div>
+      </div>
+      <div class="card bi-card">
+        <div class="card-header">Ventas por categoría</div>
+        <div class="card-body"><div echarts [options]="chartTopCategorias" class="grafico"></div></div>
+      </div>
+      <div class="card bi-card">
+        <div class="card-header">Top clientes</div>
+        <div class="card-body"><div echarts [options]="chartTopClientes" class="grafico"></div></div>
+      </div>
+      <div class="card bi-card">
+        <div class="card-header">Ventas por distrito</div>
+        <div class="card-body"><div echarts [options]="chartDistritos" class="grafico"></div></div>
+      </div>
+      <div class="card bi-card">
+        <div class="card-header">Radar de categorías (top 5)</div>
+        <div class="card-body"><div echarts [options]="chartRadarCategorias" class="grafico"></div></div>
+      </div>
+      <div class="card bi-card">
+        <div class="card-header">Mapa de calor de pedidos (día × hora)</div>
+        <div class="card-body"><div echarts [options]="chartHeatmap" class="grafico"></div></div>
+      </div>
+    </section>
+
+    <!-- ===== INVENTARIO ===== -->
+    <section *ngIf="pestania === 'inventario'" class="bi-grid" role="tabpanel">
+      <div class="card bi-card">
+        <div class="card-header">Clasificación ABC del inventario</div>
+        <div class="card-body"><div echarts [options]="chartAbc" class="grafico"></div></div>
+      </div>
+      <div class="card bi-card bi-ancha">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <span><i class="bi bi-exclamation-triangle me-1 text-warning" aria-hidden="true"></i> Alertas de reabastecimiento</span>
+          <button class="btn btn-outline-primary btn-sm" (click)="exportarCsv('alertas-stock', alertasStock)">
+            <i class="bi bi-download me-1" aria-hidden="true"></i> CSV
+          </button>
+        </div>
+        <div class="card-body table-responsive">
+          <table class="table table-hover align-middle">
+            <thead>
+              <tr><th>Producto</th><th>Stock</th><th>Mínimo</th><th>Comprar</th><th>Costo est.</th><th>Proveedor</th></tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let a of alertasStock">
+                <td>{{ a.producto }}</td>
+                <td><span class="badge bg-danger">{{ a.stock }}</span></td>
+                <td>{{ a.stockMinimo }}</td>
+                <td class="fw-bold">{{ a.comprarSugerido }}</td>
+                <td>S/ {{ a.costoEstimado | number:'1.2-2' }}</td>
+                <td>{{ a.proveedor || '—' }}</td>
+              </tr>
+              <tr *ngIf="alertasStock.length === 0">
+                <td colspan="6" class="text-center text-muted py-4">
+                  <i class="bi bi-check-circle me-1" aria-hidden="true"></i> Sin productos bajo stock mínimo
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== FINANZAS ===== -->
+    <section *ngIf="pestania === 'finanzas'" class="bi-grid" role="tabpanel">
+      <div class="card bi-card bi-ancha">
+        <div class="card-header">Flujo de caja — ingresos vs. egresos (6 meses)</div>
+        <div class="card-body"><div echarts [options]="chartFlujoCaja" class="grafico"></div></div>
+      </div>
+      <div class="card bi-card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <span>Cuentas por cobrar <span class="badge bg-info ms-1">S/ {{ totalPorCobrar | number:'1.2-2' }}</span></span>
+          <button class="btn btn-outline-primary btn-sm" (click)="exportarCsv('cuentas-por-cobrar', cuentasPorCobrar)">CSV</button>
+        </div>
+        <div class="card-body table-responsive tabla-scroll">
+          <table class="table table-hover align-middle">
+            <thead><tr><th>Pedido</th><th>Cliente</th><th>Monto</th><th>Estado</th></tr></thead>
+            <tbody>
+              <tr *ngFor="let c of cuentasPorCobrar">
+                <td>{{ c.pedido }}</td><td>{{ c.cliente }}</td>
+                <td>S/ {{ c.monto | number:'1.2-2' }}</td>
+                <td><span class="badge bg-warning">{{ c.estado }}</span></td>
+              </tr>
+              <tr *ngIf="cuentasPorCobrar.length === 0"><td colspan="4" class="text-center text-muted py-4">Sin cobros pendientes</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card bi-card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <span>Cuentas por pagar <span class="badge bg-info ms-1">S/ {{ totalPorPagar | number:'1.2-2' }}</span></span>
+          <button class="btn btn-outline-primary btn-sm" (click)="exportarCsv('cuentas-por-pagar', cuentasPorPagar)">CSV</button>
+        </div>
+        <div class="card-body table-responsive tabla-scroll">
+          <table class="table table-hover align-middle">
+            <thead><tr><th>Factura</th><th>Proveedor</th><th>Monto</th><th>Vence</th></tr></thead>
+            <tbody>
+              <tr *ngFor="let c of cuentasPorPagar">
+                <td>{{ c.factura }}</td><td>{{ c.proveedor }}</td>
+                <td>S/ {{ c.monto | number:'1.2-2' }}</td>
+                <td>
+                  <span class="badge" [class.bg-danger]="c.vencida" [class.bg-secondary]="!c.vencida">
+                    <i class="bi" [class.bi-alarm]="c.vencida" [class.bi-calendar-event]="!c.vencida" aria-hidden="true"></i>
+                    {{ c.fechaPago }}
+                  </span>
+                </td>
+              </tr>
+              <tr *ngIf="cuentasPorPagar.length === 0"><td colspan="4" class="text-center text-muted py-4">Sin pagos pendientes a proveedores</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card bi-card">
+        <div class="card-header">Compras y demora por proveedor</div>
+        <div class="card-body"><div echarts [options]="chartProveedores" class="grafico"></div></div>
+      </div>
+    </section>
+
+    <!-- ===== OPERACIÓN ===== -->
+    <section *ngIf="pestania === 'operacion'" class="bi-grid" role="tabpanel">
+      <div class="card bi-card">
+        <div class="card-header">Embudo del ciclo de pedidos</div>
+        <div class="card-body"><div echarts [options]="chartEmbudo" class="grafico"></div></div>
+      </div>
+      <div class="card bi-card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <span><i class="bi bi-alarm me-1 text-danger" aria-hidden="true"></i> Pedidos retrasados (+3 días)</span>
+          <button class="btn btn-outline-primary btn-sm" (click)="exportarCsv('pedidos-retrasados', pedidosRetrasados)">CSV</button>
+        </div>
+        <div class="card-body table-responsive tabla-scroll">
+          <table class="table table-hover align-middle">
+            <thead><tr><th>Pedido</th><th>Cliente</th><th>Estado</th><th>Total</th></tr></thead>
+            <tbody>
+              <tr *ngFor="let p of pedidosRetrasados">
+                <td>{{ p.pedido }}</td><td>{{ p.cliente }}</td>
+                <td><span class="badge bg-warning">{{ p.estado }}</span></td>
+                <td>S/ {{ p.total | number:'1.2-2' }}</td>
+              </tr>
+              <tr *ngIf="pedidosRetrasados.length === 0"><td colspan="4" class="text-center text-muted py-4">
+                <i class="bi bi-check-circle me-1" aria-hidden="true"></i> Sin pedidos retrasados</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card bi-card bi-ancha">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <span><i class="bi bi-person-dash me-1" aria-hidden="true"></i> Clientes inactivos (60+ días sin comprar) — oportunidad de recontacto</span>
+          <button class="btn btn-outline-primary btn-sm" (click)="exportarCsv('clientes-inactivos', clientesInactivos)">CSV</button>
+        </div>
+        <div class="card-body table-responsive tabla-scroll">
+          <table class="table table-hover align-middle">
+            <thead><tr><th>Cliente</th><th>Contacto</th><th>Última compra</th><th>Histórico</th></tr></thead>
+            <tbody>
+              <tr *ngFor="let c of clientesInactivos">
+                <td>{{ c.cliente }}</td>
+                <td><small>{{ c.email }}<br>{{ c.telefono }}</small></td>
+                <td>{{ c.ultimaCompra | date:'dd/MM/yyyy' }}</td>
+                <td class="fw-bold">S/ {{ c.totalHistorico | number:'1.2-2' }}</td>
+              </tr>
+              <tr *ngIf="clientesInactivos.length === 0"><td colspan="4" class="text-center text-muted py-4">Todos los clientes están activos</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </ng-container>
+</div>

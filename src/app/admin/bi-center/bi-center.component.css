@@ -1,0 +1,117 @@
+.bi-page {
+  min-height: 100vh;
+  background: var(--bg);
+  padding: 1.5rem clamp(1rem, 3vw, 2.5rem) 3rem;
+}
+
+.bi-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow-sm);
+}
+.bi-titulo {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin: 0;
+}
+.bi-subtitulo { color: var(--text-2); font-size: .88rem; margin: 0; }
+
+.bi-cargando {
+  display: grid;
+  place-items: center;
+  gap: 1rem;
+  padding: 5rem 1rem;
+  color: var(--text-2);
+}
+
+/* KPIs */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: .9rem;
+  margin-bottom: 1.5rem;
+}
+.kpi {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem 1.15rem;
+  display: flex;
+  flex-direction: column;
+  gap: .15rem;
+  box-shadow: var(--shadow-sm);
+  animation: ng-fade-up .35s var(--ease) both;
+}
+.kpi-etiqueta {
+  font-size: .72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--text-2);
+}
+.kpi-valor {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-1);
+}
+.kpi small { color: var(--text-3); font-size: .78rem; }
+.kpi-positivo small { color: var(--success); }
+.kpi-negativo small { color: var(--danger); }
+.kpi-alerta { border-color: var(--warning); }
+.kpi-alerta .kpi-valor { color: var(--warning); }
+
+/* Pestañas */
+.bi-tabs {
+  display: flex;
+  gap: .4rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.25rem;
+}
+.bi-tabs button {
+  border: 1.5px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--text-2);
+  border-radius: 999px;
+  padding: .45rem 1.1rem;
+  font-weight: 600;
+  font-size: .9rem;
+  transition: all var(--t-fast) var(--ease);
+}
+.bi-tabs button:hover { border-color: var(--brand); color: var(--brand); }
+.bi-tabs button.activa {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: var(--brand-ink);
+}
+
+/* Rejilla de tarjetas */
+.bi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(460px, 100%), 1fr));
+  gap: 1rem;
+}
+.bi-ancha { grid-column: 1 / -1; }
+.bi-card .card-header { font-size: .95rem; }
+.grafico { height: 320px; width: 100%; }
+.tabla-scroll { max-height: 340px; overflow-y: auto; }
+
+/* Impresión: informe ejecutivo limpio */
+@media print {
+  .bi-header button, .bi-tabs, .btn { display: none !important; }
+  .bi-page { padding: 0; background: #fff; }
+  .bi-grid section, .bi-card { break-inside: avoid; }
+}
+
+@media (max-width: 575.98px) {
+  .grafico { height: 260px; }
+}

@@ -1,0 +1,31 @@
+.card {
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.table th {
+  background-color: var(--surface-2);
+  border-top: none;
+  font-weight: 600;
+}
+
+.btn-group-sm > .btn {
+  padding: 0.25rem 0.5rem;
+}
+
+.badge {
+  font-size: 0.75em;
+}
+
+.modal-header {
+  background-color: var(--surface-2);
+  border-bottom: 1px solid var(--border);
+}
+
+.form-label {
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.alert {
+  margin-bottom: 0;
+}

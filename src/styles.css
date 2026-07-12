@@ -1,0 +1,660 @@
+/* =========================================================================
+   NOGAL DESIGN SYSTEM · v1.0
+   Sistema de diseño global para Comercial El Nogal.
+   Paleta derivada de la identidad de marca: verde nogal + madera de nogal.
+   Modo claro / oscuro controlado con [data-bs-theme] en <html>.
+   ========================================================================= */
+
+/* ----- 1 · Design tokens -------------------------------------------------- */
+
+:root {
+  /* Marca */
+  --brand:        #2E5B34;   /* verde nogal */
+  --brand-strong: #234728;
+  --brand-soft:   #E9F1E7;
+  --brand-ink:    #FFFFFF;   /* texto sobre verde */
+  --accent:       #B4763B;   /* madera / roble */
+  --accent-strong:#96602D;
+  --accent-soft:  #F6EBDC;
+
+  /* Superficies */
+  --bg:        #F7F6F2;
+  --surface:   #FFFFFF;
+  --surface-2: #F1EFE9;
+  --surface-3: #EAE7DE;
+  --border:    #E3E0D6;
+  --border-strong: #CFCBBE;
+
+  /* Texto */
+  --text-1: #222A20;
+  --text-2: #5D6656;
+  --text-3: #8B937F;
+
+  /* Estados */
+  --success:      #2F7A4D;
+  --success-soft: #E3F2E8;
+  --danger:       #C24141;
+  --danger-soft:  #FBE9E9;
+  --warning:      #B57A16;
+  --warning-soft: #FBF1DC;
+  --info:         #2F6F8F;
+  --info-soft:    #E5F0F5;
+
+  /* Geometría y sombra */
+  --radius-sm: 8px;
+  --radius:    12px;
+  --radius-lg: 18px;
+  --shadow-sm: 0 1px 2px rgba(28, 34, 24, .06);
+  --shadow:    0 1px 2px rgba(28, 34, 24, .05), 0 6px 20px -6px rgba(28, 34, 24, .12);
+  --shadow-lg: 0 2px 6px rgba(28, 34, 24, .06), 0 18px 44px -12px rgba(28, 34, 24, .22);
+  --ring:      0 0 0 .22rem rgba(46, 91, 52, .18);
+
+  /* Firma: veta de madera (línea de acento) */
+  --veta: linear-gradient(90deg, var(--brand) 0%, #4E7C4C 45%, var(--accent) 100%);
+
+  /* Tipografía */
+  --font-body:    'Manrope', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Outfit', var(--font-body);
+
+  /* Movimiento */
+  --ease: cubic-bezier(.22, .8, .36, 1);
+  --t-fast: .16s;
+  --t-med:  .3s;
+
+  /* Alias para CSS existente de componentes (sus :root scoped no aplican) */
+  --accent-green:  var(--brand);
+  --primary-color: var(--brand);
+  --secondary-color: var(--surface-3);
+  --accent-blue:   var(--info);
+  --accent-gold:   var(--accent);
+  --accent-purple: #7A5FBF;
+  --text-light:    var(--text-1);
+  --text-muted:    var(--text-2);
+  --card-bg:       var(--surface);
+  --hover-bg:      var(--surface-2);
+  --border-color:  var(--border);
+  --primary:       var(--brand);
+  --secondary:     var(--text-2);
+  --dark-blue:     var(--brand-strong);
+  --light-gray:    var(--surface-2);
+
+  color-scheme: light;
+}
+
+[data-bs-theme='dark'] {
+  --brand:        #4C8A54;
+  --brand-strong: #5EA167;
+  --brand-soft:   #22301F;
+  --brand-ink:    #FFFFFF;
+  --accent:       #D49A57;
+  --accent-strong:#E2AF74;
+  --accent-soft:  #2E2619;
+
+  --bg:        #131711;
+  --surface:   #1B211A;
+  --surface-2: #222A20;
+  --surface-3: #2A3327;
+  --border:    #2E372B;
+  --border-strong: #3C4738;
+
+  --text-1: #ECEFE6;
+  --text-2: #A9B39E;
+  --text-3: #7B8471;
+
+  --success:      #5CB57F;
+  --success-soft: #1D2E23;
+  --danger:       #E07B7B;
+  --danger-soft:  #33201F;
+  --warning:      #D9A24C;
+  --warning-soft: #322816;
+  --info:         #6FAECB;
+  --info-soft:    #1C2A32;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, .4);
+  --shadow:    0 1px 2px rgba(0, 0, 0, .35), 0 8px 24px -8px rgba(0, 0, 0, .55);
+  --shadow-lg: 0 2px 6px rgba(0, 0, 0, .4), 0 22px 48px -12px rgba(0, 0, 0, .65);
+  --ring:      0 0 0 .22rem rgba(94, 161, 103, .28);
+
+  color-scheme: dark;
+}
+
+/* ----- 2 · Base ----------------------------------------------------------- */
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--bg);
+  color: var(--text-1);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  transition: background-color var(--t-med) var(--ease), color var(--t-med) var(--ease);
+}
+
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -.015em;
+  color: var(--text-1);
+}
+
+p { color: inherit; }
+a { color: var(--brand); transition: color var(--t-fast) var(--ease); }
+a:hover { color: var(--brand-strong); }
+
+::selection { background: var(--brand); color: var(--brand-ink); }
+
+/* Scrollbar */
+* { scrollbar-width: thin; scrollbar-color: var(--border-strong) transparent; }
+*::-webkit-scrollbar { width: 10px; height: 10px; }
+*::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 99px; border: 2px solid var(--bg); }
+*::-webkit-scrollbar-track { background: transparent; }
+
+/* Foco visible accesible */
+:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ----- 3 · Puente de tokens Bootstrap ------------------------------------- */
+
+:root, [data-bs-theme='light'], [data-bs-theme='dark'] {
+  --bs-body-bg: var(--bg);
+  --bs-body-color: var(--text-1);
+  --bs-secondary-color: var(--text-2);
+  --bs-tertiary-color: var(--text-3);
+  --bs-border-color: var(--border);
+  --bs-primary: var(--brand);
+  --bs-primary-rgb: 46, 91, 52;
+  --bs-link-color: var(--brand);
+  --bs-link-hover-color: var(--brand-strong);
+  --bs-secondary-bg: var(--surface-2);
+  --bs-tertiary-bg: var(--surface-3);
+  --bs-emphasis-color: var(--text-1);
+  --bs-heading-color: var(--text-1);
+  --bs-body-font-family: var(--font-body);
+}
+[data-bs-theme='dark'] { --bs-primary-rgb: 76, 138, 84; }
+
+.text-primary { color: var(--brand) !important; }
+.bg-primary { background-color: var(--brand) !important; }
+.text-muted { color: var(--text-2) !important; }
+.text-success { color: var(--success) !important; }
+.text-danger { color: var(--danger) !important; }
+.text-warning { color: var(--warning) !important; }
+.text-info { color: var(--info) !important; }
+.bg-light { background-color: var(--surface-2) !important; }
+.border { border-color: var(--border) !important; }
+
+/* ----- 4 · Botones -------------------------------------------------------- */
+
+.btn {
+  --bs-btn-font-weight: 600;
+  font-family: var(--font-body);
+  border-radius: var(--radius-sm);
+  letter-spacing: .01em;
+  position: relative;
+  overflow: hidden;
+  transition: background-color var(--t-fast) var(--ease),
+              border-color var(--t-fast) var(--ease),
+              color var(--t-fast) var(--ease),
+              box-shadow var(--t-fast) var(--ease),
+              transform var(--t-fast) var(--ease);
+}
+.btn:active { transform: scale(.97); }
+.btn:focus-visible { box-shadow: var(--ring); outline: none; }
+
+/* Ripple sutil */
+.btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(255, 255, 255, .35) 0%, transparent 65%);
+  opacity: 0;
+  transform: scale(.4);
+  transition: opacity .45s var(--ease), transform .45s var(--ease);
+  pointer-events: none;
+}
+.btn:active::after { opacity: 1; transform: scale(1.6); transition: 0s; }
+
+.btn-primary {
+  --bs-btn-bg: var(--brand);
+  --bs-btn-border-color: var(--brand);
+  --bs-btn-color: var(--brand-ink);
+  --bs-btn-hover-bg: var(--brand-strong);
+  --bs-btn-hover-border-color: var(--brand-strong);
+  --bs-btn-hover-color: var(--brand-ink);
+  --bs-btn-active-bg: var(--brand-strong);
+  --bs-btn-active-border-color: var(--brand-strong);
+  --bs-btn-active-color: var(--brand-ink);
+  --bs-btn-disabled-bg: var(--brand);
+  --bs-btn-disabled-border-color: var(--brand);
+  --bs-btn-disabled-color: var(--brand-ink);
+  box-shadow: var(--shadow-sm);
+}
+.btn-primary:hover { box-shadow: var(--shadow); }
+
+.btn-outline-primary {
+  --bs-btn-color: var(--brand);
+  --bs-btn-border-color: var(--border-strong);
+  --bs-btn-hover-bg: var(--brand-soft);
+  --bs-btn-hover-border-color: var(--brand);
+  --bs-btn-hover-color: var(--brand);
+  --bs-btn-active-bg: var(--brand);
+  --bs-btn-active-border-color: var(--brand);
+  --bs-btn-active-color: var(--brand-ink);
+}
+
+.btn-success {
+  --bs-btn-bg: var(--success);
+  --bs-btn-border-color: var(--success);
+  --bs-btn-hover-bg: var(--brand-strong);
+  --bs-btn-hover-border-color: var(--brand-strong);
+  --bs-btn-active-bg: var(--brand-strong);
+  --bs-btn-active-border-color: var(--brand-strong);
+}
+.btn-outline-success {
+  --bs-btn-color: var(--success);
+  --bs-btn-border-color: var(--border-strong);
+  --bs-btn-hover-bg: var(--success-soft);
+  --bs-btn-hover-border-color: var(--success);
+  --bs-btn-hover-color: var(--success);
+  --bs-btn-active-bg: var(--success);
+  --bs-btn-active-border-color: var(--success);
+}
+
+.btn-danger {
+  --bs-btn-bg: var(--danger);
+  --bs-btn-border-color: var(--danger);
+  --bs-btn-hover-bg: #A93636;
+  --bs-btn-hover-border-color: #A93636;
+}
+.btn-outline-danger {
+  --bs-btn-color: var(--danger);
+  --bs-btn-border-color: var(--border-strong);
+  --bs-btn-hover-bg: var(--danger-soft);
+  --bs-btn-hover-border-color: var(--danger);
+  --bs-btn-hover-color: var(--danger);
+  --bs-btn-active-bg: var(--danger);
+  --bs-btn-active-border-color: var(--danger);
+}
+
+.btn-warning {
+  --bs-btn-bg: var(--accent);
+  --bs-btn-border-color: var(--accent);
+  --bs-btn-color: #FFFFFF;
+  --bs-btn-hover-bg: var(--accent-strong);
+  --bs-btn-hover-border-color: var(--accent-strong);
+  --bs-btn-hover-color: #FFFFFF;
+  --bs-btn-active-bg: var(--accent-strong);
+  --bs-btn-active-border-color: var(--accent-strong);
+  --bs-btn-active-color: #FFFFFF;
+}
+[data-bs-theme='dark'] .btn-warning { --bs-btn-color: #1C1509; --bs-btn-hover-color: #1C1509; --bs-btn-active-color: #1C1509; }
+
+.btn-secondary,
+.btn-outline-secondary {
+  --bs-btn-color: var(--text-2);
+  --bs-btn-border-color: var(--border-strong);
+  --bs-btn-bg: transparent;
+  --bs-btn-hover-bg: var(--surface-2);
+  --bs-btn-hover-color: var(--text-1);
+  --bs-btn-hover-border-color: var(--border-strong);
+  --bs-btn-active-bg: var(--surface-3);
+  --bs-btn-active-color: var(--text-1);
+  --bs-btn-active-border-color: var(--border-strong);
+}
+.btn-secondary { --bs-btn-bg: var(--surface-2); }
+
+.btn-info {
+  --bs-btn-bg: var(--info);
+  --bs-btn-border-color: var(--info);
+  --bs-btn-color: #fff;
+  --bs-btn-hover-bg: #275D78;
+  --bs-btn-hover-border-color: #275D78;
+  --bs-btn-hover-color: #fff;
+}
+.btn-light {
+  --bs-btn-bg: var(--surface-2);
+  --bs-btn-border-color: var(--border);
+  --bs-btn-color: var(--text-1);
+  --bs-btn-hover-bg: var(--surface-3);
+  --bs-btn-hover-border-color: var(--border-strong);
+  --bs-btn-hover-color: var(--text-1);
+}
+
+/* ----- 5 · Cards ----------------------------------------------------------- */
+
+.card {
+  --bs-card-bg: var(--surface);
+  --bs-card-border-color: var(--border);
+  --bs-card-cap-bg: transparent;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--t-med) var(--ease),
+              border-color var(--t-med) var(--ease),
+              background-color var(--t-med) var(--ease);
+}
+.card:hover { box-shadow: var(--shadow); }
+
+.card-header {
+  border-bottom: 1px solid var(--border);
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--text-1);
+  background: transparent;
+}
+.card-footer { border-top: 1px solid var(--border); background: transparent; }
+
+/* Cabeceras de card con colores Bootstrap → tema Nogal */
+.card-header.bg-primary,
+.card-header.bg-success { background-color: var(--brand) !important; color: var(--brand-ink); }
+.card-header.bg-dark { background-color: var(--brand-strong) !important; color: #fff; }
+
+/* ----- 6 · Formularios ------------------------------------------------------ */
+
+.form-label {
+  font-weight: 600;
+  font-size: .84rem;
+  color: var(--text-2);
+  letter-spacing: .02em;
+  margin-bottom: .35rem;
+}
+
+.form-control,
+.form-select {
+  background-color: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-1);
+  padding: .55rem .8rem;
+  transition: border-color var(--t-fast) var(--ease),
+              box-shadow var(--t-fast) var(--ease),
+              background-color var(--t-med) var(--ease);
+}
+.form-control::placeholder { color: var(--text-3); }
+.form-control:hover:not(:focus),
+.form-select:hover:not(:focus) { border-color: var(--border-strong); }
+.form-control:focus,
+.form-select:focus {
+  background-color: var(--surface);
+  border-color: var(--brand);
+  box-shadow: var(--ring);
+  color: var(--text-1);
+}
+.form-control:disabled,
+.form-select:disabled { background-color: var(--surface-2); color: var(--text-3); }
+
+.form-control.is-invalid { border-color: var(--danger); }
+.form-control.is-invalid:focus { box-shadow: 0 0 0 .22rem rgba(194, 65, 65, .16); }
+.form-control.is-valid { border-color: var(--success); }
+.form-control.is-valid:focus { box-shadow: 0 0 0 .22rem rgba(47, 122, 77, .16); }
+.invalid-feedback { color: var(--danger); font-weight: 500; }
+.valid-feedback { color: var(--success); font-weight: 500; }
+
+.form-check-input { border-color: var(--border-strong); }
+.form-check-input:checked { background-color: var(--brand); border-color: var(--brand); }
+.form-check-input:focus { box-shadow: var(--ring); border-color: var(--brand); }
+
+.input-group-text {
+  background-color: var(--surface-2);
+  border: 1.5px solid var(--border);
+  color: var(--text-2);
+  border-radius: var(--radius-sm);
+}
+
+/* ----- 7 · Tablas ------------------------------------------------------------ */
+
+.table {
+  --bs-table-bg: transparent;
+  --bs-table-color: var(--text-1);
+  --bs-table-border-color: var(--border);
+  --bs-table-striped-bg: var(--surface-2);
+  --bs-table-striped-color: var(--text-1);
+  --bs-table-hover-bg: var(--brand-soft);
+  --bs-table-hover-color: var(--text-1);
+  vertical-align: middle;
+}
+.table > thead th {
+  font-family: var(--font-body);
+  font-size: .72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--text-2);
+  border-bottom: 1.5px solid var(--border-strong);
+  padding-top: .7rem;
+  padding-bottom: .7rem;
+  white-space: nowrap;
+}
+.table > tbody td { padding-top: .72rem; padding-bottom: .72rem; }
+.table > tbody tr { transition: background-color var(--t-fast) var(--ease); }
+
+.table-dark,
+.table > thead.table-dark th,
+thead.table-dark th {
+  --bs-table-bg: var(--surface-3);
+  --bs-table-color: var(--text-1);
+  background-color: var(--surface-3);
+  color: var(--text-1);
+  border-color: var(--border);
+}
+.table-light, thead.table-light th {
+  --bs-table-bg: var(--surface-2);
+  --bs-table-color: var(--text-2);
+}
+.table-responsive {
+  border-radius: var(--radius);
+}
+
+/* ----- 8 · Badges, alerts, misc ------------------------------------------------ */
+
+.badge {
+  font-weight: 600;
+  letter-spacing: .02em;
+  border-radius: 999px;
+  padding: .38em .72em;
+}
+.badge.bg-primary { background-color: var(--brand) !important; color: var(--brand-ink); }
+.badge.bg-success { background-color: var(--success-soft) !important; color: var(--success); }
+.badge.bg-danger { background-color: var(--danger-soft) !important; color: var(--danger); }
+.badge.bg-warning { background-color: var(--warning-soft) !important; color: var(--warning); }
+.badge.bg-warning.text-dark { color: var(--warning) !important; }
+.badge.bg-info.text-dark { color: var(--info) !important; }
+[data-bs-theme='dark'] .modal-content .text-dark { color: var(--text-1) !important; }
+.badge.bg-info { background-color: var(--info-soft) !important; color: var(--info); }
+.badge.bg-secondary { background-color: var(--surface-3) !important; color: var(--text-2); }
+.badge.bg-light { background-color: var(--surface-2) !important; color: var(--text-2); }
+.badge.bg-dark { background-color: var(--text-1) !important; color: var(--bg); }
+
+.alert { border-radius: var(--radius); border-width: 1px; font-weight: 500; }
+.alert-info { background-color: var(--info-soft); border-color: transparent; color: var(--info); }
+.alert-success { background-color: var(--success-soft); border-color: transparent; color: var(--success); }
+.alert-danger { background-color: var(--danger-soft); border-color: transparent; color: var(--danger); }
+.alert-warning { background-color: var(--warning-soft); border-color: transparent; color: var(--warning); }
+
+.dropdown-menu {
+  --bs-dropdown-bg: var(--surface);
+  --bs-dropdown-border-color: var(--border);
+  --bs-dropdown-link-color: var(--text-1);
+  --bs-dropdown-link-hover-bg: var(--brand-soft);
+  --bs-dropdown-link-hover-color: var(--text-1);
+  --bs-dropdown-link-active-bg: var(--brand);
+  --bs-dropdown-link-active-color: var(--brand-ink);
+  --bs-dropdown-divider-bg: var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  padding: .45rem;
+  animation: ng-fade-up .18s var(--ease);
+}
+.dropdown-item { border-radius: var(--radius-sm); padding: .5rem .75rem; font-weight: 500; }
+
+.modal-content {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  animation: ng-scale-in .22s var(--ease);
+}
+.modal-header { border-bottom: 1px solid var(--border); }
+.modal-footer { border-top: 1px solid var(--border); }
+.modal-title { font-family: var(--font-display); }
+.modal-backdrop.show { opacity: .45; }
+[data-bs-theme='dark'] .modal-backdrop.show { opacity: .65; }
+
+.pagination {
+  --bs-pagination-bg: var(--surface);
+  --bs-pagination-color: var(--text-2);
+  --bs-pagination-border-color: var(--border);
+  --bs-pagination-hover-bg: var(--surface-2);
+  --bs-pagination-hover-color: var(--text-1);
+  --bs-pagination-hover-border-color: var(--border-strong);
+  --bs-pagination-focus-bg: var(--surface-2);
+  --bs-pagination-focus-color: var(--text-1);
+  --bs-pagination-focus-box-shadow: var(--ring);
+  --bs-pagination-active-bg: var(--brand);
+  --bs-pagination-active-border-color: var(--brand);
+  --bs-pagination-active-color: var(--brand-ink);
+  --bs-pagination-disabled-bg: var(--surface);
+  --bs-pagination-disabled-color: var(--text-3);
+  --bs-pagination-disabled-border-color: var(--border);
+}
+.page-link { font-weight: 600; }
+.page-item:first-child .page-link { border-radius: var(--radius-sm) 0 0 var(--radius-sm); }
+.page-item:last-child .page-link { border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
+
+.nav-tabs {
+  --bs-nav-tabs-border-color: var(--border);
+  --bs-nav-tabs-link-active-bg: transparent;
+  --bs-nav-tabs-link-active-color: var(--brand);
+  --bs-nav-tabs-link-active-border-color: transparent transparent var(--brand);
+  --bs-nav-link-color: var(--text-2);
+  --bs-nav-link-hover-color: var(--text-1);
+}
+.nav-tabs .nav-link { font-weight: 600; border-bottom-width: 2px; }
+
+.breadcrumb-item a { text-decoration: none; font-weight: 500; }
+.breadcrumb-item.active { color: var(--text-2); }
+
+.list-group {
+  --bs-list-group-bg: var(--surface);
+  --bs-list-group-border-color: var(--border);
+  --bs-list-group-color: var(--text-1);
+  --bs-list-group-action-hover-bg: var(--surface-2);
+  --bs-list-group-action-hover-color: var(--text-1);
+}
+
+.spinner-border { border-right-color: transparent; }
+.text-bg-primary { background-color: var(--brand) !important; color: var(--brand-ink) !important; }
+
+hr { border-color: var(--border); opacity: 1; }
+
+/* ----- 9 · Animaciones ---------------------------------------------------------- */
+
+@keyframes ng-fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes ng-fade-up { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+@keyframes ng-fade-down { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: none; } }
+@keyframes ng-scale-in { from { opacity: 0; transform: scale(.96); } to { opacity: 1; transform: none; } }
+@keyframes ng-shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+@keyframes ng-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+
+/* Transición de página: anima el componente enrutado */
+router-outlet + * {
+  display: block;
+  animation: ng-fade-up .34s var(--ease);
+}
+
+.anim-fade-in { animation: ng-fade-in .4s var(--ease) both; }
+.anim-fade-up { animation: ng-fade-up .4s var(--ease) both; }
+.anim-scale-in { animation: ng-scale-in .3s var(--ease) both; }
+.anim-float { animation: ng-float 5s ease-in-out infinite; }
+
+/* Skeleton loading */
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: var(--surface-2);
+  border-radius: var(--radius-sm);
+  color: transparent !important;
+  pointer-events: none;
+}
+.skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .35), transparent);
+  background-size: 200% 100%;
+  animation: ng-shimmer 1.4s linear infinite;
+}
+[data-bs-theme='dark'] .skeleton::after {
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .06), transparent);
+  background-size: 200% 100%;
+}
+
+/* Firma de marca: veta superior */
+.veta-top { position: relative; }
+.veta-top::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--veta);
+  border-radius: 3px 3px 0 0;
+}
+
+/* ----- 10 · Utilidades y accesibilidad ------------------------------------------- */
+
+.surface { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
+.elevated { box-shadow: var(--shadow); }
+
+img { max-width: 100%; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ----- 11 · Accesibilidad global ------------------------------------------------- */
+
+/* Escala de texto controlada por el widget de accesibilidad */
+html { font-size: var(--acc-escala-texto, 100%); }
+
+/* Tipografía amigable para dislexia (OpenDyslexic con Comic Sans de respaldo) */
+html.acc-fuente-dislexia body,
+html.acc-fuente-dislexia .btn,
+html.acc-fuente-dislexia .form-control,
+html.acc-fuente-dislexia .form-select,
+html.acc-fuente-dislexia h1, html.acc-fuente-dislexia h2, html.acc-fuente-dislexia h3,
+html.acc-fuente-dislexia h4, html.acc-fuente-dislexia h5, html.acc-fuente-dislexia h6 {
+  font-family: 'OpenDyslexic', 'Comic Sans MS', 'Comic Sans', var(--font-body) !important;
+}
+
+/* Espaciado de lectura ampliado (dislexia / TDAH) */
+html.acc-lectura-espaciada body {
+  letter-spacing: .12em;
+  word-spacing: .16em;
+  line-height: 1.9;
+}
+html.acc-lectura-espaciada p,
+html.acc-lectura-espaciada li,
+html.acc-lectura-espaciada td,
+html.acc-lectura-espaciada label {
+  line-height: 1.9;
+}
+
+/* Filtros para daltonismo (aplicados a toda la aplicación) */
+html[data-filtro-color='deuteranopia'] body { filter: url('#filtro-deuteranopia'); }
+html[data-filtro-color='protanopia'] body { filter: url('#filtro-protanopia'); }
+html[data-filtro-color='tritanopia'] body { filter: url('#filtro-tritanopia'); }
+html[data-filtro-color='grises'] body { filter: grayscale(1); }
+
+/* Robustez ante zoom 200%: evitar desbordes y solapes */
+body { overflow-wrap: break-word; }
+img, svg, video { max-width: 100%; height: auto; }
+.table-responsive { overflow-x: auto; }

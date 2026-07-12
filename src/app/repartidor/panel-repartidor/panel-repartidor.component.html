@@ -1,0 +1,420 @@
+<div class="panel-repartidor">
+  <!-- Header -->
+  <div class="header">
+    <div class="header-content">
+      <div class="welcome">
+        <h1>🚚 Panel de Repartidor</h1>
+        <p>Gestiona las entregas de pedidos</p>
+      </div>
+      <div class="user-info">
+        <div class="user-details">
+          <strong>{{usuarioActual?.nombres}} {{usuarioActual?.apellidos}}</strong>
+          <span class="user-role">Repartidor</span>
+        </div>
+        <button class="btn btn-outline-danger btn-sm" (click)="logout()">
+          Cerrar Sesión
+        </button>
+      </div>
+    </div>
+
+    <!-- Estadísticas -->
+    <div class="stats-grid">
+      <div class="stat-card" (click)="cambiarTab('pendientes')" [class.active]="esTabActiva('pendientes')">
+        <div class="stat-icon">📦</div>
+        <div class="stat-info">
+          <div class="stat-number">{{pedidosPendientes}}</div>
+          <div class="stat-label">Pedidos Pendientes</div>
+        </div>
+      </div>
+      <div class="stat-card" (click)="cambiarTab('realizadas')" [class.active]="esTabActiva('realizadas')">
+        <div class="stat-icon">✅</div>
+        <div class="stat-info">
+          <div class="stat-number">{{totalEntregas}}</div>
+          <div class="stat-label">Entregas Realizadas</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">📋</div>
+        <div class="stat-info">
+          <div class="stat-number">{{pedidos.length + reportes.length}}</div>
+          <div class="stat-label">Total Gestión</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pestañas de Navegación -->
+  <div class="tabs-navigation">
+    <button 
+      class="tab-button" 
+      [class.active]="esTabActiva('pendientes')"
+      (click)="cambiarTab('pendientes')">
+      📦 Pedidos Pendientes ({{pedidosPendientes}})
+    </button>
+    <button 
+      class="tab-button" 
+      [class.active]="esTabActiva('realizadas')"
+      (click)="cambiarTab('realizadas')">
+      ✅ Entregas Realizadas ({{totalEntregas}})
+    </button>
+  </div>
+
+  <!-- Contenido Principal -->
+  <div class="contenido-principal">
+    
+    <!-- Loading -->
+    <div *ngIf="loading" class="loading-state">
+      <div class="spinner"></div>
+      <p>Cargando datos...</p>
+    </div>
+
+    <!-- Pestaña: Pedidos Pendientes -->
+    <div *ngIf="!loading && esTabActiva('pendientes')">
+      
+      <!-- Lista de Pedidos Pendientes -->
+      <div *ngIf="pedidos.length > 0" class="pedidos-container">
+        <h2 class="seccion-titulo">📦 Pedidos para Entregar ({{pedidos.length}})</h2>
+        
+        <div class="pedidos-grid">
+          <div *ngFor="let pedido of pedidos" class="pedido-card">
+            
+            <!-- Header del Pedido - Siempre visible -->
+            <div class="pedido-header" (click)="togglePedido(pedido.id)">
+              <div class="pedido-info-basica">
+                <div class="pedido-numero">
+                  <h3>Pedido #{{pedido.numeroPedido}}</h3>
+                  <span class="badge estado-enviado">LISTO PARA ENTREGA</span>
+                </div>
+                <div class="pedido-cliente">
+                  <strong>Cliente:</strong> {{pedido.usuario.nombres}} {{pedido.usuario.apellidos}}
+                </div>
+                <div class="pedido-direccion">
+                  <strong>Dirección:</strong> {{pedido.direccion.direccion}} {{pedido.direccion.numero}}
+                </div>
+                <div class="pedido-total">
+                  <strong>Total:</strong> S/ {{pedido.total}}
+                </div>
+              </div>
+              
+              <div class="pedido-controls">
+                <div class="pedido-fecha">
+                  {{pedido.fechaPedido | date:'dd/MM/yyyy HH:mm'}}
+                </div>
+                <div class="pedido-acciones">
+                  <button class="btn btn-primary btn-sm" (click)="iniciarEntrega(pedido); $event.stopPropagation()">
+                    🚚 Iniciar Entrega
+                  </button>
+                  <div class="dropdown">
+                    <button class="dropdown-toggle" (click)="toggleMenu(pedido.id); $event.stopPropagation()">
+                      ⋮
+                    </button>
+                    <div class="dropdown-menu" [class.show]="pedido.mostrarMenu">
+                      <button class="dropdown-item" (click)="llamarCliente(pedido)">
+                        📞 Llamar Cliente
+                      </button>
+                      <button class="dropdown-item" (click)="verUbicacion(pedido)">
+                        🗺️ Ver Ubicación
+                      </button>
+                      <div class="dropdown-divider"></div>
+                      <button class="dropdown-item text-danger" (click)="reportarProblema(pedido)">
+                        ⚠️ Reportar Problema
+                      </button>
+                    </div>
+                  </div>
+                  <span class="toggle-icon" [class.rotated]="pedido.mostrarDetalles">
+                    ▼
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Contenido desplegable del pedido -->
+            <div class="pedido-contenido" [class.show]="pedido.mostrarDetalles">
+              
+              <!-- Información Expandida -->
+              <div class="contenido-expandido">
+                
+                <!-- Sección 1: Información del Cliente -->
+                <div class="seccion">
+                  <h4 class="seccion-titulo">👤 Información del Cliente</h4>
+                  <div class="info-grid">
+                    <div class="info-item">
+                      <strong>Nombre completo:</strong>
+                      <span>{{pedido.usuario.nombres}} {{pedido.usuario.apellidos}}</span>
+                    </div>
+                    <div class="info-item">
+                      <strong>Email:</strong>
+                      <span>{{pedido.usuario.email}}</span>
+                    </div>
+                    <div class="info-item">
+                      <strong>Teléfono:</strong>
+                      <span>{{pedido.usuario.telefono}}</span>
+                    </div>
+                    <div class="info-item">
+                      <strong>Documento:</strong>
+                      <span>{{pedido.usuario.tipoDocumento}} - {{pedido.usuario.numeroDocumento}}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Sección 2: Dirección de Entrega -->
+                <div class="seccion">
+                  <h4 class="seccion-titulo">🏠 Dirección de Entrega</h4>
+                  <div class="direccion-completa">
+                    <div class="info-grid">
+                      <div class="info-item">
+                        <strong>Dirección completa:</strong>
+                        <span>{{pedido.direccion.direccion}} {{pedido.direccion.numero}}</span>
+                      </div>
+                      <div class="info-item" *ngIf="pedido.direccion.departamento">
+                        <strong>Departamento:</strong>
+                        <span>{{pedido.direccion.departamento}}</span>
+                      </div>
+                      <div class="info-item" *ngIf="pedido.direccion.provincia">
+                        <strong>Provincia:</strong>
+                        <span>{{pedido.direccion.provincia}}</span>
+                      </div>
+                      <div class="info-item" *ngIf="pedido.direccion.distrito">
+                        <strong>Distrito:</strong>
+                        <span>{{pedido.direccion.distrito}}</span>
+                      </div>
+                      <div class="info-item">
+                        <strong>Teléfono contacto:</strong>
+                        <span>{{pedido.direccion.telefono}}</span>
+                      </div>
+                      <div class="info-item">
+                        <strong>Persona que recibe:</strong>
+                        <span>{{pedido.direccion.nombreReceptor}} {{pedido.direccion.apellidosReceptor}}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Sección 3: Productos del Pedido -->
+                <div class="seccion">
+                  <h4 class="seccion-titulo">📦 Productos del Pedido</h4>
+                  <div class="productos-lista">
+                    <div *ngFor="let detalle of pedido.detalles" class="producto-item">
+                      <div class="producto-info">
+                        <span class="producto-nombre">{{detalle.producto.nombre}}</span>
+                        <span class="producto-cantidad">x{{detalle.cantidad}}</span>
+                      </div>
+                      <div class="producto-detalles">
+                        <span class="producto-precio">S/ {{detalle.precioUnitario}} c/u</span>
+                        <span class="producto-subtotal">S/ {{detalle.subtotal}}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Sección 4: Resumen del Pedido -->
+                <div class="seccion">
+                  <h4 class="seccion-titulo">💰 Resumen del Pedido</h4>
+                  <div class="resumen-pedido">
+                    <div class="resumen-item">
+                      <span>Subtotal:</span>
+                      <span>S/ {{pedido.subtotal}}</span>
+                    </div>
+                    <div class="resumen-item">
+                      <span>IGV (18%):</span>
+                      <span>S/ {{pedido.igv}}</span>
+                    </div>
+                    <div class="resumen-item">
+                      <span>Envío:</span>
+                      <span>S/ {{pedido.envio}}</span>
+                    </div>
+                    <div class="resumen-item total">
+                      <span><strong>Total:</strong></span>
+                      <span><strong>S/ {{pedido.total}}</strong></span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Sección 5: Registrar Entrega -->
+                <div class="seccion entrega">
+                  <h4 class="seccion-titulo">🚚 Registrar Entrega</h4>
+                  
+                  <div *ngIf="!pedido.mostrarFormularioEntrega" class="accion-inicial">
+                    <button class="btn btn-primary btn-lg" (click)="iniciarEntrega(pedido)">
+                      📋 Iniciar Proceso de Entrega
+                    </button>
+                  </div>
+
+                  <div *ngIf="pedido.mostrarFormularioEntrega" class="formulario-entrega">
+                    <!-- Campo de código de verificación -->
+                    <div class="form-group">
+                      <label for="codigoVerificacion-{{pedido.id}}">
+                        🔢 Código de Verificación *
+                        <span class="codigo-info" *ngIf="pedido.codigoVerificacion">
+                          (Ingresa el código que el cliente debe proporcionar)
+                        </span>
+                      </label>
+                      <input
+                        type="text"
+                        [id]="'codigoVerificacion-' + pedido.id"
+                        [(ngModel)]="pedido.codigoVerificacion"
+                        placeholder="Ej: 123456"
+                        class="form-control"
+                        maxlength="6"
+                        pattern="[0-9]*"
+                        required>
+                      <small class="text-muted">
+                        ⚠️ Solicita al cliente el código de verificación de 4-6 dígitos que recibió con su pedido
+                      </small>
+                      
+                      <!-- Mensaje de ayuda -->
+                      <div class="alert alert-info mt-2" *ngIf="!pedido.codigoVerificacion">
+                        <small>
+                          <strong>💡 Instrucciones:</strong><br>
+                          1. Entrega el pedido al cliente<br>
+                          2. Solicita el código de verificación<br>
+                          3. Ingresa el código aquí para confirmar la entrega
+                        </small>
+                      </div>
+                    </div>
+
+                    <!-- Campo para subir archivos -->
+                    <div class="form-group">
+                      <label>📎 Archivos Adjuntos</label>
+                      <div class="file-upload-container">
+                        <input
+                          type="file"
+                          [id]="'archivos-' + pedido.id"
+                          (change)="onFileSelected($event, pedido)"
+                          multiple
+                          accept=".jpg,.jpeg,.png,.pdf,.doc,.docx,.txt"
+                          class="file-input">
+                        <label [for]="'archivos-' + pedido.id" class="file-upload-label">
+                          <span class="upload-icon">📁</span>
+                          <span class="upload-text">Seleccionar archivos (Fotos, PDF, Word)</span>
+                          <small class="text-muted">Formatos permitidos: JPG, PNG, PDF, DOC, DOCX, TXT (Máx. 5MB por archivo)</small>
+                        </label>
+                      </div>
+
+                      <!-- Lista de archivos seleccionados -->
+                      <div *ngIf="pedido.archivosSeleccionados && pedido.archivosSeleccionados.length > 0" class="archivos-lista">
+                        <h5>Archivos seleccionados:</h5>
+                        <div *ngFor="let archivo of pedido.archivosSeleccionados; let i = index" class="archivo-item">
+                          <div class="archivo-info">
+                            <span class="archivo-icon">{{getFileIcon(archivo.file.type)}}</span>
+                            <span class="archivo-nombre">{{archivo.file.name}}</span>
+                            <span class="archivo-tamaño">({{formatFileSize(archivo.file.size)}})</span>
+                          </div>
+                          <button type="button" class="btn-eliminar" (click)="eliminarArchivo(pedido, i)">
+                            ❌
+                          </button>
+                        </div>
+                      </div>
+
+                      <!-- Vista previa de imágenes -->
+                      <div *ngIf="pedido.imagenesPrevia && pedido.imagenesPrevia.length > 0" class="vista-previa">
+                        <h5>Vista previa de imágenes:</h5>
+                        <div class="imagenes-grid">
+                          <div *ngFor="let preview of pedido.imagenesPrevia; let i = index" class="imagen-preview">
+                            <img [src]="preview.url" [alt]="'Vista previa ' + (i + 1)" class="preview-img">
+                            <div class="preview-info">
+                              <span>{{preview.nombre}}</span>
+                              <button type="button" class="btn-eliminar-small" (click)="eliminarArchivoPorNombre(pedido, preview.nombre)">
+                                ×
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="acciones-entrega">
+                      <button 
+                        class="btn btn-success"
+                        (click)="confirmarEntrega(pedido)"
+                        [disabled]="!pedido.codigoVerificacion">
+                        ✅ Confirmar Entrega Exitosa
+                      </button>
+                      <button 
+                        class="btn btn-secondary"
+                        (click)="cancelarEntrega(pedido)">
+                        ❌ Cancelar
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Estado Vacío para Pedidos Pendientes -->
+      <div *ngIf="!loading && pedidos.length === 0 && esTabActiva('pendientes')" class="empty-state">
+        <div class="empty-icon">📭</div>
+        <h3>No hay pedidos para entregar</h3>
+        <p>Cuando haya pedidos en estado "ENVIADO", aparecerán aquí.</p>
+        <button class="btn btn-primary mt-3" (click)="cargarDatos()">
+          🔄 Actualizar
+        </button>
+      </div>
+    </div>
+
+    <!-- Pestaña: Entregas Realizadas -->
+    <div *ngIf="!loading && esTabActiva('realizadas')">
+      
+      <!-- Lista de Entregas Realizadas -->
+      <div *ngIf="reportes.length > 0" class="entregas-realizadas">
+        <h2 class="seccion-titulo">✅ Entregas Realizadas ({{reportes.length}})</h2>
+        
+        <div class="reportes-grid">
+          <div *ngFor="let reporte of reportes" class="reporte-card">
+            <div class="reporte-header">
+              <h3>Entrega #{{reporte.id}}</h3>
+              <span class="badge estado-entregado">ENTREGADO</span>
+            </div>
+            
+            <div class="reporte-info">
+              <div class="info-item">
+                <strong>📦 Pedido:</strong> 
+                <span>#{{reporte.pedido?.numeroPedido || 'N/A'}}</span>
+              </div>
+              
+              <div class="info-item">
+                <strong>📅 Fecha entrega:</strong> 
+                <span>{{reporte.fechaEntrega | date:'dd/MM/yyyy HH:mm'}}</span>
+              </div>
+              
+              <div class="info-item">
+                <strong>🔢 Código:</strong> 
+                <span class="codigo-verificado">{{reporte.codigoVerificacion}}</span>
+              </div>
+              
+              <div class="info-item" *ngIf="reporte.observaciones">
+                <strong>📝 Observaciones:</strong> 
+                <span>{{reporte.observaciones}}</span>
+              </div>
+              
+              <div class="info-item" *ngIf="reporte.archivosAdjuntos">
+                <strong>📎 Archivos:</strong> 
+                <span>{{reporte.archivosAdjuntos}}</span>
+              </div>
+            </div>
+            
+            <div class="reporte-cliente" *ngIf="reporte.pedido?.usuario">
+              <strong>👤 Cliente:</strong> 
+              {{reporte.pedido.usuario.nombres}} {{reporte.pedido.usuario.apellidos}}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Estado Vacío para Entregas Realizadas -->
+      <div *ngIf="!loading && reportes.length === 0 && esTabActiva('realizadas')" class="empty-state">
+        <div class="empty-icon">📋</div>
+        <h3>No hay entregas realizadas</h3>
+        <p>Cuando confirmes entregas, aparecerán aquí.</p>
+        <button class="btn btn-outline-primary mt-3" (click)="cargarEntregasRealizadas()">
+          🔄 Verificar entregas
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
