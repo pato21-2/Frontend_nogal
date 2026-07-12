@@ -8,7 +8,7 @@ import { Producto } from '../../models/producto';
 })
 export class ProductoService {
   private http = inject(HttpClient);
-  private urlservicio = appsettings.apiurl + "/producto";
+  private urlservicio = appsettings.apiurl + "producto";
 
   constructor() { }
 
